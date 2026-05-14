@@ -1,0 +1,14 @@
+body {
+  background: #000000;
+  color: #e8d5ff;
+  font-family: 'Rajdhani', sans-serif;
+  margin: 0;
+}
+canvas#starfield {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+}@media (max-width: 640px) {
+  h1 { font-size: 28px; }
+  #models { flex-direction: column; }
+}
