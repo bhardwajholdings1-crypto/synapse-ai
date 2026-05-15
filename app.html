@@ -114,8 +114,8 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
 // ✏️ PASTE YOUR SUPABASE CREDENTIALS HERE
-const SUPABASE_URL  = 'https://pxxeaqtghjqzsiqlhtme.supabase.co'
-const SUPABASE_ANON = 'sb_publishable_bbL0XiXl_CEEPQ1dNfjViQ_zUGDU3c1'
+const SUPABASE_URL  = 'YOUR_SUPABASE_URL'
+const SUPABASE_ANON = 'YOUR_SUPABASE_ANON_KEY'
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON)
 
 // Auth guard
@@ -136,11 +136,11 @@ document.getElementById('logout-btn').addEventListener('click', async () => {
 // ============================================================
 const MODELS = [
   { id: 'nvidia/nemotron-3-super-120b-a12b:free', name: 'SYNAPSE NEMOTRON', maker: 'NVIDIA',      tag: 'FREE',      color: '#00ff9d', desc: '120B · MoE · 262K ctx', emoji: '⚡' },
-  { id: 'deepseek/deepseek-v4-pro',               name: 'SYNAPSE DEEPSEEK', maker: 'DeepSeek',    tag: '5M FREE',   color: '#4fc3f7', desc: '1.6T · MoE · 1M ctx',  emoji: '🔭' },
-  { id: 'x-ai/grok-4-3',                          name: 'SYNAPSE GROK',     maker: 'xAI',         tag: 'TRIAL',     color: '#e0e0e0', desc: '1M ctx · Live X data',  emoji: '✦'  },
-  { id: 'google/gemini-3.1-pro',                  name: 'SYNAPSE GEMINI',   maker: 'Google',      tag: 'FREE TIER', color: '#ffca28', desc: '1M ctx · Multimodal',   emoji: '◉'  },
-  { id: 'moonshotai/kimi-k2.6',                   name: 'SYNAPSE KIMI',     maker: 'Moonshot AI', tag: 'PAID',      color: '#ce93d8', desc: '1T · MoE · Agents',     emoji: '🌙' },
-  { id: 'openai/gpt-5.5',                         name: 'SYNAPSE GPT',      maker: 'OpenAI',      tag: 'PAID',      color: '#a5d6a7', desc: 'Agentic · Multimodal',  emoji: '◎'  },
+  { id: 'deepseek/deepseek-v4-pro',               name: 'SYNAPSE DEEPSEEK', maker: 'DeepSeek',    tag: '5M FREE',   color: '#00e5ff', desc: '1.6T · MoE · 1M ctx',  emoji: '🔭' },
+  { id: 'x-ai/grok-4-3',                          name: 'SYNAPSE GROK',     maker: 'xAI',         tag: 'TRIAL',     color: '#90e0ef', desc: '1M ctx · Live X data',  emoji: '✦'  },
+  { id: 'google/gemini-3.1-pro',                  name: 'SYNAPSE GEMINI',   maker: 'Google',      tag: 'FREE TIER', color: '#48cae4', desc: '1M ctx · Multimodal',   emoji: '◉'  },
+  { id: 'moonshotai/kimi-k2.6',                   name: 'SYNAPSE KIMI',     maker: 'Moonshot AI', tag: 'PAID',      color: '#ade8f4', desc: '1T · MoE · Agents',     emoji: '🌙' },
+  { id: 'openai/gpt-5.5',                         name: 'SYNAPSE GPT',      maker: 'OpenAI',      tag: 'PAID',      color: '#caf0f8', desc: 'Agentic · Multimodal',  emoji: '◎'  },
 ]
 
 // ============================================================

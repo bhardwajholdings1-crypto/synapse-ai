@@ -7,24 +7,24 @@
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap');
 
 :root {
-  /* ✏️ COLORS */
-  --void:        #000000;
-  --deep:        #04000f;
-  --panel:       #080018;
-  --panel2:      #0d0022;
-  --border:      #1a0040;
-  --border2:     #2d0070;
-  --purple:      #7b00ff;
-  --purple2:     #bf00ff;
-  --purple3:     #e040fb;
-  --violet:      #3d0080;
-  --text:        #e8d5ff;
-  --text-dim:    #7a5a9a;
-  --text-faint:  #2a1050;
+  /* ✏️ COLORS — Teal/Cyan Space Theme */
+  --void:        #000508;
+  --deep:        #000d14;
+  --panel:       #010f1a;
+  --panel2:      #021525;
+  --border:      #062030;
+  --border2:     #0a3548;
+  --purple:      #00b4d8;
+  --purple2:     #00e5ff;
+  --purple3:     #48cae4;
+  --violet:      #023e58;
+  --text:        #caf0f8;
+  --text-dim:    #4a90a4;
+  --text-faint:  #0a2535;
   --green:       #00ff9d;
   --cyan:        #00e5ff;
-  --gold:        #ffd600;
-  --red:         #ff003c;
+  --gold:        #90e0ef;
+  --red:         #ff006e;
   --white:       #ffffff;
 
   /* ✏️ FONTS */
@@ -32,10 +32,10 @@
   --font-body:   'Rajdhani', sans-serif;
   --font-mono:   'Share Tech Mono', monospace;
 
-  /* GLOWS */
-  --glow-sm:     0 0 8px var(--purple);
-  --glow-md:     0 0 15px var(--purple), 0 0 40px rgba(123,0,255,0.3);
-  --glow-lg:     0 0 25px var(--purple2), 0 0 80px rgba(191,0,255,0.2);
+  /* GLOWS — Teal/Cyan */
+  --glow-sm:     0 0 8px #00b4d8;
+  --glow-md:     0 0 15px #00b4d8, 0 0 40px rgba(0,180,216,0.3);
+  --glow-lg:     0 0 25px #00e5ff, 0 0 80px rgba(0,229,255,0.2);
 }
 
 /* ── RESET ── */
