@@ -63,4 +63,4 @@ synapse-ai/
 - **Change branding**: Search and replace "SYNAPSE AI" or "BhardwajTechnologieS"
 
 ---
-© 2026 BhardwajTechnologieS. All rights reserved.
+© 2026 BhardwajTechnologieS. All rights reserved .
