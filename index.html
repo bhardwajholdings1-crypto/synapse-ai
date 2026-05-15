@@ -2,39 +2,199 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>SYNAPSE AI — A BhardwajTechnologieS Initiative</title>
+  <meta name="description" content="SYNAPSE AI — 6 frontier AI models unified. Built by Arnav Bhardwaj, CEO/Chairman BhardwajTechnologieS."/>
   <link rel="stylesheet" href="style.css"/>
+  <link rel="manifest" href="manifest.json"/>
+  <meta name="theme-color" content="#7b00ff"/>
 </head>
-<body>
-  <h1>SYNAPSE AI</h1>
-  <p>A BhardwajTechnologieS Initiative</p>
-  <script src="app.js"></script>
-</body>
-</html><nav>
-  <span>◈ SYNAPSE AI</span>
-  <a href="login.html">Login</a>
-</nav><section id="hero">
-  <h1>SYNAPSE AI</h1>
-  <p>Intelligence forged in the void</p>
-  <p>A BhardwajTechnologieS Initiative</p>
-  <a href="login.html">Get Access Free</a>
-</section><section id="models">
-  <div class="model-card">
-    <span>⚡</span>
-    <h3>SYNAPSE NEMOTRON</h3>
-    <p>120B · FREE</p>
+<body class="landing-body">
+
+<!-- BACKGROUNDS -->
+<canvas id="starfield"></canvas>
+<div class="scanlines"></div>
+<div class="vignette"></div>
+<div class="noise"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <span class="nav-logo-sym">◈</span>
+    <span class="nav-logo-text">SYNAPSE AI</span>
   </div>
-  <!-- repeat for all 6 models -->
-</section><section id="features">
-  <h2>WHY SYNAPSE</h2>
-  <div class="feature">6 Frontier Models</div>
-  <div class="feature">Real-time Streaming</div>
-  <div class="feature">22nd Century Interface</div>
-</section><section id="download">
-  <button id="install-btn">Install App</button>
-  <a href="synapse.apk" download>Download for Android</a>
-</section><footer>
-  <p>Built by Arnav Bhardwaj — CEO/Chairman</p>
-  <p>BhardwajTechnologieS</p>
-  <p>© 2026 BhardwajTechnologieS. All rights reserved.</p>
+  <div class="nav-links">
+    <button class="nav-btn" onclick="location.href='login.html'">Login</button>
+    <button class="nav-btn primary" onclick="location.href='login.html'">Get Access</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-scan"></div>
+  <div class="hero-eyebrow">◈ BHARDWAJTECHNOLOGIES PRESENTS</div>
+  <h1 class="hero-title glitch">SYNAPSE<span> AI</span></h1>
+  <p class="hero-sub">Intelligence forged in the void · 22nd century AI · Available now</p>
+  <p class="hero-tagline">A BhardwajTechnologieS Initiative</p>
+  <div class="hero-btns">
+    <button class="hero-btn primary" onclick="location.href='login.html'">ACCESS SYNAPSE FREE</button>
+    <button class="hero-btn secondary" onclick="location.href='#models-section'">EXPLORE MODELS</button>
+  </div>
+</section>
+
+<!-- MODELS -->
+<section id="models-section">
+  <p class="section-title">FRONTIER INTELLIGENCE</p>
+  <h2 class="section-heading">6 MODELS. ONE INTERFACE.</h2>
+  <div class="models-grid" id="models-grid"></div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <p class="section-title">CAPABILITIES</p>
+  <h2 class="section-heading">BUILT FOR THE FUTURE</h2>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">⚡</div>
+      <div class="feature-title">REAL-TIME STREAMING</div>
+      <div class="feature-desc">Live token-by-token responses. Watch intelligence unfold in real time.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔀</div>
+      <div class="feature-title">MODEL SWITCHING</div>
+      <div class="feature-desc">Switch between 6 frontier models mid-conversation instantly.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔒</div>
+      <div class="feature-title">PRIVATE & SECURE</div>
+      <div class="feature-desc">Password protected. Your conversations stay private.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📱</div>
+      <div class="feature-title">INSTALL AS APP</div>
+      <div class="feature-desc">Add to your home screen. Works like a native app on any device.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">💾</div>
+      <div class="feature-title">CONVERSATION HISTORY</div>
+      <div class="feature-desc">Your chats are saved. Pick up exactly where you left off.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🌌</div>
+      <div class="feature-title">22ND CENTURY UI</div>
+      <div class="feature-desc">Sci-fi HUD interface. Dark. Immersive. Built for the future.</div>
+    </div>
+  </div>
+</section>
+
+<!-- DOWNLOAD -->
+<section id="download">
+  <p class="section-title">GET SYNAPSE AI</p>
+  <h2 class="section-heading">ON EVERY DEVICE</h2>
+  <div class="download-btns">
+    <button class="dl-btn" id="pwa-install-btn">
+      <span class="dl-btn-icon">📱</span>
+      <div>
+        <div style="font-size:9px;color:var(--text-dim);margin-bottom:2px">ADD TO HOME SCREEN</div>
+        <div>Install App</div>
+      </div>
+    </button>
+    <a class="dl-btn" href="synapse.apk" download>
+      <span class="dl-btn-icon">🤖</span>
+      <div>
+        <div style="font-size:9px;color:var(--text-dim);margin-bottom:2px">ANDROID APK</div>
+        <div>Download App</div>
+      </div>
+    </a>
+    <button class="dl-btn" onclick="location.href='app.html'">
+      <span class="dl-btn-icon">🌐</span>
+      <div>
+        <div style="font-size:9px;color:var(--text-dim);margin-bottom:2px">NO INSTALL NEEDED</div>
+        <div>Open in Browser</div>
+      </div>
+    </button>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">◈ SYNAPSE AI</div>
+  <div class="footer-tagline">A BhardwajTechnologieS Initiative</div>
+  <div class="footer-credits">Built by <strong>Arnav Bhardwaj</strong> — CEO / Chairman, BhardwajTechnologieS</div>
+  <div class="footer-copy">© 2026 BhardwajTechnologieS. All rights reserved.</div>
 </footer>
+
+<script>
+// ✏️ MODELS CONFIG — same as app.js, used for landing page cards
+const MODELS = [
+  { id: 'nvidia/nemotron-3-super-120b-a12b:free', name: 'SYNAPSE NEMOTRON', maker: 'NVIDIA',       tag: 'FREE',      tagColor: '#00ff9d', desc: '120B · MoE · 262K ctx', emoji: '⚡' },
+  { id: 'deepseek/deepseek-v4-pro',               name: 'SYNAPSE DEEPSEEK', maker: 'DeepSeek',     tag: '5M FREE',   tagColor: '#4fc3f7', desc: '1.6T · MoE · 1M ctx',  emoji: '🔭' },
+  { id: 'x-ai/grok-4-3',                          name: 'SYNAPSE GROK',     maker: 'xAI',          tag: 'TRIAL',     tagColor: '#e0e0e0', desc: '1M ctx · Live X data',  emoji: '✦'  },
+  { id: 'google/gemini-3.1-pro',                  name: 'SYNAPSE GEMINI',   maker: 'Google',       tag: 'FREE TIER', tagColor: '#ffca28', desc: '1M ctx · Multimodal',   emoji: '◉'  },
+  { id: 'moonshotai/kimi-k2.6',                   name: 'SYNAPSE KIMI',     maker: 'Moonshot AI',  tag: 'PAID',      tagColor: '#ce93d8', desc: '1T · MoE · Agents',     emoji: '🌙' },
+  { id: 'openai/gpt-5.5',                         name: 'SYNAPSE GPT',      maker: 'OpenAI',       tag: 'PAID',      tagColor: '#a5d6a7', desc: 'Agentic · Multimodal',  emoji: '◎'  },
+];
+
+// Build model cards
+const grid = document.getElementById('models-grid');
+MODELS.forEach(m => {
+  grid.innerHTML += `
+    <div class="model-card hud-box">
+      <div class="model-card-top">
+        <span class="model-emoji">${m.emoji}</span>
+        <div>
+          <div class="model-card-name" style="color:${m.tagColor}">${m.name}</div>
+          <div class="model-card-maker">${m.maker}</div>
+        </div>
+        <span class="model-card-badge" style="border-color:${m.tagColor};color:${m.tagColor}">${m.tag}</span>
+      </div>
+      <div class="model-card-desc">${m.desc}</div>
+    </div>`;
+});
+
+// Starfield
+const canvas = document.getElementById('starfield');
+const ctx = canvas.getContext('2d');
+let stars = [];
+function initStars() {
+  canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+  stars = Array.from({length: 200}, () => ({
+    x: Math.random() * canvas.width, y: Math.random() * canvas.height,
+    r: Math.random() * 1.5, speed: Math.random() * 0.3 + 0.05,
+    opacity: Math.random()
+  }));
+}
+function drawStars() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  stars.forEach(s => {
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(232,213,255,${s.opacity})`;
+    ctx.fill();
+    s.y += s.speed;
+    s.opacity = 0.3 + 0.7 * Math.sin(Date.now() * 0.001 + s.x);
+    if (s.y > canvas.height) { s.y = 0; s.x = Math.random() * canvas.width; }
+  });
+  requestAnimationFrame(drawStars);
+}
+initStars(); drawStars();
+window.addEventListener('resize', initStars);
+
+// PWA install
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault(); deferredPrompt = e;
+  document.getElementById('pwa-install-btn').style.display = 'flex';
+});
+document.getElementById('pwa-install-btn').addEventListener('click', () => {
+  if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt = null; }
+  else alert('To install: tap Share → Add to Home Screen (iOS) or use Chrome menu → Add to Home Screen (Android)');
+});
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js')
+    .then(() => console.log('SYNAPSE SW registered'))
+}
+</script>
+</body>
+</html>
