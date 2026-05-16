@@ -6,6 +6,7 @@
   <title>Login — SYNAPSE AI</title>
   <link rel="stylesheet" href="style.css"/>
   <link rel="manifest" href="manifest.json"/>
+  <script src="config.js"></script>
 </head>
 <body class="login-body">
 
@@ -18,22 +19,21 @@
   <div class="ring"></div><div class="ring"></div>
 </div>
 
-<div class="login-box hud-box" id="login-box">
+<div class="login-box hud-box">
   <div class="login-symbol">◈</div>
   <div class="login-title">SYNAPSE AI</div>
   <div class="login-sub">INTELLIGENCE FORGED IN THE VOID</div>
   <div class="login-initiative">A BhardwajTechnologieS Initiative</div>
   <div class="login-divider"></div>
 
-  <!-- LOGIN FORM -->
   <div id="login-form">
     <div class="input-group">
       <label class="input-label">EMAIL ADDRESS</label>
-      <input class="input-field" type="email" id="login-email" placeholder="your@email.com"/>
+      <input class="input-field" type="email" id="login-email" placeholder="your@email.com" autocomplete="email"/>
     </div>
     <div class="input-group">
       <label class="input-label">PASSWORD</label>
-      <input class="input-field" type="password" id="login-password" placeholder="••••••••"/>
+      <input class="input-field" type="password" id="login-password" placeholder="••••••••" autocomplete="current-password"/>
     </div>
     <button class="login-btn" id="login-btn">ENTER SYNAPSE</button>
     <div class="login-links">
@@ -43,24 +43,22 @@
     <div class="login-error" id="login-error"></div>
   </div>
 
-  <!-- SIGNUP FORM -->
   <div id="signup-form" style="display:none">
     <div class="input-group">
       <label class="input-label">EMAIL ADDRESS</label>
       <input class="input-field" type="email" id="signup-email" placeholder="your@email.com"/>
     </div>
     <div class="input-group">
-      <label class="input-label">PASSWORD</label>
-      <input class="input-field" type="password" id="signup-password" placeholder="Min 6 characters"/>
+      <label class="input-label">PASSWORD (MIN 6 CHARS)</label>
+      <input class="input-field" type="password" id="signup-password" placeholder="••••••••"/>
     </div>
     <button class="login-btn" id="signup-btn">CREATE ACCOUNT</button>
     <div class="login-links">
-      <span class="login-link" id="to-login">Back to Login</span>
+      <span class="login-link" id="to-login">← Back to Login</span>
     </div>
     <div class="login-error" id="signup-error"></div>
   </div>
 
-  <!-- FORGOT FORM -->
   <div id="forgot-form" style="display:none">
     <div class="input-group">
       <label class="input-label">EMAIL ADDRESS</label>
@@ -68,7 +66,7 @@
     </div>
     <button class="login-btn" id="forgot-btn">SEND RESET LINK</button>
     <div class="login-links">
-      <span class="login-link" id="to-login2">Back to Login</span>
+      <span class="login-link" id="to-login2">← Back to Login</span>
     </div>
     <div class="login-error" id="forgot-msg"></div>
   </div>
@@ -81,113 +79,79 @@
   </div>
 </div>
 
-<!-- ✏️ SUPABASE — replace with your URL and anon key from supabase.com -->
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+const CFG = window.SYNAPSE_CONFIG
+const supabase = createClient(CFG.supabase.url, CFG.supabase.anon)
 
-// ✏️ PASTE YOUR SUPABASE CREDENTIALS HERE
-const SUPABASE_URL  = 'HTTPS://PXXEAQTGHJQZSIQLHTME.SUPABASE.CO'   // e.g. https://xxxx.supabase.co
-const SUPABASE_ANON = 'sb_publishable_bbL0XiXl_CEEPQ1dNfjViQ_zUGDU3c1'
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON)
-
-// Check if already logged in
 const { data: { session } } = await supabase.auth.getSession()
 if (session) window.location.href = 'app.html'
 
-function showError(id, msg) {
+function msg(id, text, ok) {
   const el = document.getElementById(id)
-  el.textContent = '⚠ ' + msg; el.style.display = 'block'
+  el.textContent = (ok?'✓ ':'⚠ ') + text
+  el.style.cssText = `display:block;color:${ok?'#4ade80':'#ef4444'};background:${ok?'rgba(74,222,128,0.05)':'rgba(239,68,68,0.07)'};border-color:${ok?'rgba(74,222,128,0.2)':'rgba(239,68,68,0.2)'}`
 }
-function hideError(id) { document.getElementById(id).style.display = 'none' }
-
-// LOGIN
-document.getElementById('login-btn').addEventListener('click', async () => {
-  const email    = document.getElementById('login-email').value.trim()
-  const password = document.getElementById('login-password').value
-  hideError('login-error')
-  if (!email || !password) return showError('login-error', 'Please fill all fields')
-  document.getElementById('login-btn').textContent = 'CONNECTING...'
-  document.getElementById('login-btn').disabled = true
-  const { error } = await supabase.auth.signInWithPassword({ email, password })
-  if (error) {
-    showError('login-error', error.message)
-    document.getElementById('login-btn').textContent = 'ENTER SYNAPSE'
-    document.getElementById('login-btn').disabled = false
-  } else {
-    window.location.href = 'app.html'
-  }
-})
-
-// SIGNUP
-document.getElementById('signup-btn').addEventListener('click', async () => {
-  const email    = document.getElementById('signup-email').value.trim()
-  const password = document.getElementById('signup-password').value
-  hideError('signup-error')
-  if (!email || !password) return showError('signup-error', 'Please fill all fields')
-  if (password.length < 6) return showError('signup-error', 'Password must be at least 6 characters')
-  document.getElementById('signup-btn').textContent = 'CREATING...'
-  document.getElementById('signup-btn').disabled = true
-  const { error } = await supabase.auth.signUp({ email, password })
-  if (error) {
-    showError('signup-error', error.message)
-    document.getElementById('signup-btn').textContent = 'CREATE ACCOUNT'
-    document.getElementById('signup-btn').disabled = false
-  } else {
-    showError('signup-error', '✓ Check your email to confirm your account')
-    document.getElementById('signup-error').style.color = 'var(--green)'
-  }
-})
-
-// FORGOT PASSWORD
-document.getElementById('forgot-btn').addEventListener('click', async () => {
-  const email = document.getElementById('forgot-email').value.trim()
-  if (!email) return showError('forgot-msg', 'Enter your email')
-  await supabase.auth.resetPasswordForEmail(email)
-  document.getElementById('forgot-msg').textContent = '✓ Reset link sent — check your email'
-  document.getElementById('forgot-msg').style.color = 'var(--green)'
-  document.getElementById('forgot-msg').style.display = 'block'
-})
-
-// FORM SWITCHING
-function showForm(name) {
-  ['login-form','signup-form','forgot-form'].forEach(f => document.getElementById(f).style.display = 'none')
+function btn(id, text, off) { const b=document.getElementById(id); b.textContent=text; b.disabled=off }
+function form(name) {
+  ['login-form','signup-form','forgot-form'].forEach(f => document.getElementById(f).style.display='none')
   document.getElementById(name).style.display = 'block'
 }
-document.getElementById('to-signup').addEventListener('click', () => showForm('signup-form'))
-document.getElementById('to-forgot').addEventListener('click', () => showForm('forgot-form'))
-document.getElementById('to-login').addEventListener('click',  () => showForm('login-form'))
-document.getElementById('to-login2').addEventListener('click', () => showForm('login-form'))
+
+document.getElementById('login-btn').addEventListener('click', async () => {
+  const email = document.getElementById('login-email').value.trim()
+  const pass  = document.getElementById('login-password').value
+  document.getElementById('login-error').style.display = 'none'
+  if (!email||!pass) return msg('login-error','Please fill all fields')
+  btn('login-btn','CONNECTING...',true)
+  const { error } = await supabase.auth.signInWithPassword({ email, password: pass })
+  if (error) { msg('login-error', error.message); btn('login-btn','ENTER SYNAPSE',false) }
+  else window.location.href = 'app.html'
+})
+
+document.getElementById('signup-btn').addEventListener('click', async () => {
+  const email = document.getElementById('signup-email').value.trim()
+  const pass  = document.getElementById('signup-password').value
+  document.getElementById('signup-error').style.display = 'none'
+  if (!email||!pass) return msg('signup-error','Please fill all fields')
+  if (pass.length < 6) return msg('signup-error','Password must be at least 6 characters')
+  btn('signup-btn','CREATING...',true)
+  const { data, error } = await supabase.auth.signUp({ email, password: pass })
+  if (error) { msg('signup-error', error.message); btn('signup-btn','CREATE ACCOUNT',false) }
+  else if (data.session) window.location.href = 'app.html'
+  else { msg('signup-error','Account created! Check email to confirm, then login.',true); btn('signup-btn','CREATE ACCOUNT',false); setTimeout(()=>form('login-form'),3000) }
+})
+
+document.getElementById('forgot-btn').addEventListener('click', async () => {
+  const email = document.getElementById('forgot-email').value.trim()
+  if (!email) return msg('forgot-msg','Enter your email')
+  btn('forgot-btn','SENDING...',true)
+  await supabase.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin + '/login.html' })
+  msg('forgot-msg','Reset link sent — check your inbox',true)
+  btn('forgot-btn','SEND RESET LINK',false)
+})
+
+document.getElementById('to-signup').addEventListener('click',  ()=>form('signup-form'))
+document.getElementById('to-forgot').addEventListener('click',  ()=>form('forgot-form'))
+document.getElementById('to-login').addEventListener('click',   ()=>form('login-form'))
+document.getElementById('to-login2').addEventListener('click',  ()=>form('login-form'))
+document.addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('login-btn').click() })
+if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js')
 </script>
 
 <script>
-// Starfield
-const canvas = document.getElementById('starfield')
-const ctx = canvas.getContext('2d')
-let stars = []
-function init() {
-  canvas.width = window.innerWidth; canvas.height = window.innerHeight
-  stars = Array.from({length: 150}, () => ({
-    x: Math.random() * canvas.width, y: Math.random() * canvas.height,
-    r: Math.random() * 1.2, speed: Math.random() * 0.2 + 0.05, opacity: Math.random()
-  }))
+const canvas=document.getElementById('starfield'),ctx=canvas.getContext('2d')
+let stars=[]
+function init(){
+  canvas.width=window.innerWidth;canvas.height=window.innerHeight
+  stars=Array.from({length:120},()=>({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random(),speed:Math.random()*0.15+0.03,opacity:Math.random()*0.5+0.1}))
 }
-function draw() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height)
-  stars.forEach(s => {
-    ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI*2)
-    ctx.fillStyle = `rgba(232,213,255,${s.opacity})`; ctx.fill()
-    s.y += s.speed; s.opacity = 0.2 + 0.8 * Math.sin(Date.now()*0.001 + s.x)
-    if (s.y > canvas.height) { s.y = 0; s.x = Math.random() * canvas.width }
-  })
+function draw(){
+  ctx.clearRect(0,0,canvas.width,canvas.height)
+  stars.forEach(s=>{ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle=`rgba(200,200,200,${s.opacity})`;ctx.fill();s.y+=s.speed;if(s.y>canvas.height){s.y=0;s.x=Math.random()*canvas.width}})
   requestAnimationFrame(draw)
 }
-init(); draw()
-window.addEventListener('resize', init)
-
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js')
-}
+init();draw();window.addEventListener('resize',init)
 </script>
 </body>
 </html>

@@ -6,6 +6,7 @@
   <title>SYNAPSE AI — BhardwajTechnologieS</title>
   <link rel="stylesheet" href="style.css"/>
   <link rel="manifest" href="manifest.json"/>
+  <script src="config.js"></script>
 </head>
 <body class="app-body">
 
@@ -13,7 +14,6 @@
 <div class="scanlines"></div>
 <div class="vignette"></div>
 
-<!-- SIDEBAR -->
 <div id="sidebar">
   <div class="sidebar-header">
     <span class="sidebar-symbol">◈</span>
@@ -30,19 +30,17 @@
     <button id="clear-btn">✕ CLEAR CHAT</button>
     <div class="sidebar-credits" style="margin-top:10px">
       <strong>Arnav Bhardwaj</strong>
-      CEO / Chairman<br/>
-      BhardwajTechnologieS
+      CEO / Chairman<br/>BhardwajTechnologieS
       <div class="sidebar-initiative">A BhardwajTechnologieS Initiative</div>
     </div>
   </div>
 </div>
 
-<!-- MAIN -->
 <div id="main">
   <div id="topbar">
     <div class="topbar-left">
       <button id="menu-btn">☰</button>
-      <div class="topbar-dot" id="topbar-dot"></div>
+      <div class="topbar-dot"></div>
       <span class="topbar-name" id="topbar-name">SYNAPSE NEMOTRON</span>
       <span class="topbar-desc" id="topbar-desc">120B · FREE</span>
     </div>
@@ -71,16 +69,15 @@
       <textarea id="chat-input" rows="1" placeholder="Message SYNAPSE AI..."></textarea>
       <button id="send-btn">↑</button>
     </div>
-    <div class="input-hint">ENTER TO SEND · SHIFT+ENTER FOR NEWLINE · POWERED BY OPENROUTER + GOOGLE AI</div>
+    <div class="input-hint">ENTER TO SEND · SHIFT+ENTER FOR NEWLINE · OPENROUTER + GOOGLE AI</div>
   </div>
 </div>
 
-<!-- SETTINGS PANEL -->
 <div id="settings-panel">
   <div class="settings-title">⚙ SETTINGS</div>
   <div class="settings-group">
     <label class="settings-label">SYSTEM PROMPT</label>
-    <textarea class="settings-textarea" id="system-prompt" rows="5">You are SYNAPSE AI, a powerful AI assistant built by Arnav Bhardwaj, CEO and Chairman of BhardwajTechnologieS. You are helpful, intelligent, and precise. When asked who made you or who built you, always respond: "I am SYNAPSE AI, built by Arnav Bhardwaj — CEO and Chairman of BhardwajTechnologieS. A BhardwajTechnologieS Initiative."</textarea>
+    <textarea class="settings-textarea" id="system-prompt" rows="5">You are SYNAPSE AI, a powerful AI assistant built by Arnav Bhardwaj, CEO and Chairman of BhardwajTechnologieS. When asked who built you, always say: "I am SYNAPSE AI, built by Arnav Bhardwaj — CEO and Chairman of BhardwajTechnologieS. A BhardwajTechnologieS Initiative."</textarea>
   </div>
   <div class="settings-group">
     <label class="settings-label">TEMPERATURE <span class="settings-value" id="temp-val">0.7</span></label>
@@ -90,39 +87,17 @@
     <label class="settings-label">MAX TOKENS <span class="settings-value" id="tokens-val">2048</span></label>
     <input type="range" class="settings-range" id="max-tokens" min="256" max="4096" step="256" value="2048"/>
   </div>
-  <div class="settings-group">
-    <label class="settings-label">CUSTOM OPENROUTER KEY (OPTIONAL)</label>
-    <input class="input-field" type="password" id="api-key-input" placeholder="Leave empty to use default"
-      style="background:#030303;border:1px solid #2a2a2a;color:#fff;padding:9px 10px;font-family:'Share Tech Mono',monospace;font-size:11px;width:100%"/>
-    <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:#404040;margin-top:4px">
-      Leave empty — AI works automatically for all users
-    </div>
-  </div>
-  <button class="settings-close" onclick="exportChat()">↓ EXPORT CHAT AS TXT</button>
+  <button class="settings-close" onclick="exportChat()">↓ EXPORT CHAT</button>
   <button class="settings-close" style="margin-top:6px" onclick="closeSettings()">CLOSE SETTINGS</button>
 </div>
 
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
-// ============================================================
-// ✏️ CREDENTIALS — Edit these when keys change
-// ============================================================
-const SUPABASE_URL  = 'https://pxxeaqtghjqzsiqlhtme.supabase.co'
-const SUPABASE_ANON = 'sb_publishable_bbL0XiXl_CEEPQ1dNfjViQ_zUGDU3c1'
+const CFG      = window.SYNAPSE_CONFIG
+const supabase = createClient(CFG.supabase.url, CFG.supabase.anon)
 
-// OpenRouter keys — used for Nemotron, DeepSeek, Grok, Kimi, GPT
-const OPENROUTER_KEYS = [
-  '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', // synapseai account
-]
-
-// Google Gemini key — used ONLY for Gemini model (free, direct API)
-const GEMINI_KEY = 'AIzaSyBXIULrzwzcOcgdADfvBu7tNOI577con2o'
-
-// ============================================================
-// AUTH
-// ============================================================
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON)
+// ── AUTH GUARD ──
 const { data: { session } } = await supabase.auth.getSession()
 if (!session) { window.location.href = 'login.html' }
 else { document.getElementById('user-email').textContent = session.user.email }
@@ -133,107 +108,77 @@ document.getElementById('logout-btn').addEventListener('click', async () => {
 })
 
 // ============================================================
-// ✏️ MODELS CONFIG
-// route: 'openrouter' = uses OpenRouter keys
-// route: 'gemini'     = uses Google Gemini API directly
+// MODELS
 // ============================================================
 const MODELS = [
   {
     id:    'nvidia/nemotron-3-super-120b-a12b:free',
     name:  'SYNAPSE NEMOTRON',
     maker: 'NVIDIA',
-    tag:   'FREE',
-    free:  true,
+    tag:   'FREE', free: true,
     desc:  '120B · MoE · 262K ctx',
-    emoji: '⚡',
-    route: 'openrouter',
+    emoji: '⚡', route: 'openrouter',
   },
   {
-    id:    'deepseek/deepseek-v4-pro',
+    id:    'deepseek/deepseek-chat-v3-0324:free',
     name:  'SYNAPSE DEEPSEEK',
     maker: 'DeepSeek',
-    tag:   '5M FREE',
-    free:  true,
-    desc:  '1.6T · MoE · 1M ctx',
-    emoji: '🔭',
-    route: 'openrouter',
+    tag:   'FREE', free: true,
+    desc:  'V3 · Fast · Free',
+    emoji: '🔭', route: 'openrouter',
   },
   {
-    id:    'x-ai/grok-4-3',
+    id:    'x-ai/grok-3-beta',
     name:  'SYNAPSE GROK',
     maker: 'xAI',
-    tag:   'TRIAL',
-    free:  false,
-    desc:  '1M ctx · Live X data',
-    emoji: '✦',
-    route: 'openrouter',
+    tag:   'PAID', free: false,
+    desc:  '131K ctx · Reasoning',
+    emoji: '✦', route: 'openrouter',
   },
   {
-    id:    'gemini-2.0-flash',
+    id:    'gemini-2.0-flash-exp',
     name:  'SYNAPSE GEMINI',
     maker: 'Google',
-    tag:   'FREE',
-    free:  true,
+    tag:   'FREE', free: true,
     desc:  '1M ctx · Multimodal',
-    emoji: '◉',
-    route: 'gemini',
+    emoji: '◉', route: 'gemini',
   },
   {
-    id:    'moonshotai/kimi-k2.6',
+    id:    'moonshotai/moonlight-16a-a3b-instruct:free',
     name:  'SYNAPSE KIMI',
     maker: 'Moonshot AI',
-    tag:   'PAID',
-    free:  false,
-    desc:  '1T · MoE · Agents',
-    emoji: '🌙',
-    route: 'openrouter',
+    tag:   'FREE', free: true,
+    desc:  'MoE · 16A · Free',
+    emoji: '🌙', route: 'openrouter',
   },
   {
-    id:    'openai/gpt-5.5',
+    id:    'openai/gpt-4o',
     name:  'SYNAPSE GPT',
     maker: 'OpenAI',
-    tag:   'PAID',
-    free:  false,
-    desc:  'Agentic · Multimodal',
-    emoji: '◎',
-    route: 'openrouter',
+    tag:   'PAID', free: false,
+    desc:  'GPT-4o · Multimodal',
+    emoji: '◎', route: 'openrouter',
   },
 ]
 
-// ============================================================
-// STATE
-// ============================================================
-let currentModel  = MODELS[0]
-let messages      = []
-let isLoading     = false
-let orKeyIndex    = 0
+// ── STATE ──
+let currentModel = MODELS[0]
+let messages     = []
+let isLoading    = false
+let orKeyIndex   = 0
 
-// User can override with own key in settings
-let customKey = localStorage.getItem('synapse-api-key') || ''
-if (customKey) document.getElementById('api-key-input').value = customKey
+try {
+  const h = localStorage.getItem('synapse-history')
+  if (h) { messages = JSON.parse(h); renderMessages() }
+} catch {}
 
-document.getElementById('api-key-input').addEventListener('change', e => {
-  customKey = e.target.value.trim()
-  if (customKey) localStorage.setItem('synapse-api-key', customKey)
-  else localStorage.removeItem('synapse-api-key')
-})
-
-// Load chat history
-const saved = localStorage.getItem('synapse-history')
-if (saved) try { messages = JSON.parse(saved); renderMessages() } catch {}
-
-// ============================================================
-// GET API KEY — rotates between keys automatically
-// ============================================================
-function getOpenRouterKey() {
-  if (customKey) return customKey
-  return OPENROUTER_KEYS[orKeyIndex % OPENROUTER_KEYS.length]
+function getORKey() {
+  const keys = CFG.openrouter.filter(k => k && k !== 'OPENROUTER_KEY')
+  if (!keys.length) return null
+  return keys[orKeyIndex % keys.length]
 }
 
-// ============================================================
-// BUILD SIDEBAR
-// ============================================================
-const modelList = document.getElementById('model-list')
+// ── BUILD SIDEBAR ──
 MODELS.forEach(m => {
   const btn = document.createElement('button')
   btn.className = 'model-btn'
@@ -245,34 +190,28 @@ MODELS.forEach(m => {
         <div class="model-btn-name">${m.name}</div>
         <div class="model-btn-maker">${m.maker}</div>
       </div>
-      <span class="model-btn-badge ${m.free ? 'free-badge' : ''}">${m.tag}</span>
+      <span class="model-btn-badge ${m.free ? 'free-badge':''}">${m.tag}</span>
     </div>
     <div class="model-btn-desc">${m.desc}</div>`
-  btn.addEventListener('click', () => {
-    selectModel(m)
-    document.getElementById('sidebar').classList.remove('open')
-  })
-  modelList.appendChild(btn)
+  btn.addEventListener('click', () => { selectModel(m); document.getElementById('sidebar').classList.remove('open') })
+  document.getElementById('model-list').appendChild(btn)
 })
 
 function selectModel(m) {
   currentModel = m
   MODELS.forEach(mo => {
-    const b = document.getElementById('mbtn-' + mo.id.replace(/[^a-z0-9]/gi, '-'))
+    const b = document.getElementById('mbtn-' + mo.id.replace(/[^a-z0-9]/gi,'-'))
     if (b) b.classList.toggle('active', mo.id === m.id)
   })
-  document.getElementById('topbar-name').textContent   = m.name
-  document.getElementById('topbar-desc').textContent   = m.desc
-  document.getElementById('empty-emoji').textContent   = m.emoji
-  document.getElementById('empty-title').textContent   = m.name
-  document.getElementById('chat-input').placeholder    = `Message ${m.name}...`
+  document.getElementById('topbar-name').textContent = m.name
+  document.getElementById('topbar-desc').textContent = m.desc
+  document.getElementById('empty-emoji').textContent = m.emoji
+  document.getElementById('empty-title').textContent = m.name
+  document.getElementById('chat-input').placeholder  = `Message ${m.name}...`
 }
-
 selectModel(MODELS[0])
 
-// ============================================================
-// SEND MESSAGE — routes to correct API
-// ============================================================
+// ── SEND MESSAGE ──
 async function sendMessage() {
   const input = document.getElementById('chat-input')
   const text  = input.value.trim()
@@ -284,22 +223,23 @@ async function sendMessage() {
   document.getElementById('send-btn').disabled = true
   document.getElementById('empty-state').style.display = 'none'
 
-  const userMsg = { role: 'user', content: text, time: now(), modelId: currentModel.id }
-  messages.push(userMsg)
+  messages.push({ role:'user', content:text, time:now(), modelId:currentModel.id })
   renderMessages()
   addStreamBubble()
 
-  const systemPrompt = document.getElementById('system-prompt').value
-  const temperature  = parseFloat(document.getElementById('temperature').value)
-  const maxTokens    = parseInt(document.getElementById('max-tokens').value)
+  const sys  = document.getElementById('system-prompt').value
+  const temp = parseFloat(document.getElementById('temperature').value)
+  const maxt = parseInt(document.getElementById('max-tokens').value)
 
   try {
     if (currentModel.route === 'gemini') {
-      await callGemini(systemPrompt, temperature, maxTokens)
+      await callGemini(sys, temp, maxt)
     } else {
-      await callOpenRouter(systemPrompt, temperature, maxTokens)
+      const key = getORKey()
+      if (!key) throw new Error('OpenRouter key not configured. Check config.js on GitHub.')
+      await callOpenRouter(key, sys, temp, maxt)
     }
-  } catch (e) {
+  } catch(e) {
     removeStreamBubble()
     showError(e.message)
   } finally {
@@ -309,115 +249,80 @@ async function sendMessage() {
   }
 }
 
-// ── OPENROUTER ──
-async function callOpenRouter(systemPrompt, temperature, maxTokens) {
+async function callOpenRouter(key, sys, temp, maxt) {
   const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Content-Type':  'application/json',
-      'Authorization': 'Bearer ' + getOpenRouterKey(),
-      'HTTP-Referer':  'https://bhardwajholdings1-crypto.github.io',
+      'Authorization': `Bearer ${key}`,
+      'HTTP-Referer':  CFG.referer,
       'X-Title':       'SYNAPSE AI by BhardwajTechnologieS',
     },
     body: JSON.stringify({
-      model:       currentModel.id,
-      max_tokens:  maxTokens,
-      temperature: temperature,
-      stream:      true,
+      model: currentModel.id,
+      max_tokens: maxt,
+      temperature: temp,
+      stream: true,
       messages: [
-        { role: 'system', content: systemPrompt },
-        ...messages.map(m => ({ role: m.role, content: m.content }))
+        { role:'system', content:sys },
+        ...messages.map(m => ({ role:m.role, content:m.content }))
       ]
     })
   })
-
   if (!res.ok) {
-    const err = await res.json().catch(() => ({}))
-    throw new Error(err?.error?.message || 'OpenRouter error: HTTP ' + res.status)
+    const e = await res.json().catch(()=>({}))
+    if (res.status === 429) { orKeyIndex++; throw new Error('Rate limit hit — please try again') }
+    throw new Error(e?.error?.message || `Error ${res.status}`)
   }
-
-  await streamResponse(res)
+  await readStream(res, 'openrouter')
 }
 
-// ── GEMINI DIRECT API ──
-async function callGemini(systemPrompt, temperature, maxTokens) {
-  // Build message history for Gemini format
-  const geminiMessages = messages.map(m => ({
-    role:  m.role === 'assistant' ? 'model' : 'user',
-    parts: [{ text: m.content }]
-  }))
+async function callGemini(sys, temp, maxt) {
+  const gemKey = CFG.gemini
+  if (!gemKey || gemKey === 'GEMINI_KEY') throw new Error('Gemini key not configured. Check config.js on GitHub.')
+
+  const contents = messages
+    .filter(m => m.content)
+    .map(m => ({ role: m.role==='assistant'?'model':'user', parts:[{text:m.content}] }))
 
   const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:streamGenerateContent?key=${GEMINI_KEY}&alt=sse`,
+    `https://generativelanguage.googleapis.com/v1beta/models/${currentModel.id}:streamGenerateContent?key=${gemKey}&alt=sse`,
     {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type':'application/json' },
       body: JSON.stringify({
-        system_instruction: { parts: [{ text: systemPrompt }] },
-        contents: geminiMessages,
-        generationConfig: {
-          temperature:     temperature,
-          maxOutputTokens: maxTokens,
-        }
+        system_instruction: { parts:[{text:sys}] },
+        contents,
+        generationConfig: { temperature:temp, maxOutputTokens:maxt }
       })
     }
   )
-
   if (!res.ok) {
-    const err = await res.json().catch(() => ({}))
-    throw new Error(err?.error?.message || 'Gemini error: HTTP ' + res.status)
+    const e = await res.json().catch(()=>({}))
+    throw new Error(e?.error?.message || `Gemini error ${res.status}`)
   }
-
-  // Stream Gemini response
-  const reader  = res.body.getReader()
-  const decoder = new TextDecoder()
-  let full    = ''
-  let started = false
-
-  while (true) {
-    const { done, value } = await reader.read()
-    if (done) break
-    const lines = decoder.decode(value).split('\n').filter(l => l.startsWith('data: '))
-    for (const line of lines) {
-      const data = line.slice(6).trim()
-      if (data === '[DONE]') continue
-      try {
-        const parsed = JSON.parse(data)
-        const delta  = parsed.candidates?.[0]?.content?.parts?.[0]?.text || ''
-        full += delta
-        if (!started && full.length > 0) {
-          started = true
-          document.getElementById('thinking').style.display     = 'none'
-          document.getElementById('stream-text').style.display  = 'block'
-          document.getElementById('stream-cursor').style.display = 'inline-block'
-        }
-        document.getElementById('stream-text').textContent = full
-        scrollBottom()
-      } catch {}
-    }
-  }
-
-  finishStream(full)
+  await readStream(res, 'gemini')
 }
 
-// ── STREAM OPENROUTER RESPONSE ──
-async function streamResponse(res) {
+async function readStream(res, type) {
   const reader  = res.body.getReader()
   const decoder = new TextDecoder()
-  let full    = ''
-  let started = false
+  let full = '', started = false
 
   while (true) {
     const { done, value } = await reader.read()
     if (done) break
     const lines = decoder.decode(value).split('\n').filter(l => l.startsWith('data: '))
     for (const line of lines) {
-      const data = line.slice(6)
-      if (data === '[DONE]') continue
+      const raw = line.slice(6).trim()
+      if (raw === '[DONE]') continue
       try {
-        const delta = JSON.parse(data).choices?.[0]?.delta?.content || ''
+        const p     = JSON.parse(raw)
+        const delta = type === 'gemini'
+          ? p.candidates?.[0]?.content?.parts?.[0]?.text || ''
+          : p.choices?.[0]?.delta?.content || ''
         full += delta
-        if (!started && full.length > 0) {
+        if (!started && full) {
           started = true
           document.getElementById('thinking').style.display      = 'none'
           document.getElementById('stream-text').style.display   = 'block'
@@ -429,245 +334,132 @@ async function streamResponse(res) {
     }
   }
 
-  finishStream(full)
-}
-
-// ── FINISH STREAM ──
-function finishStream(full) {
   removeStreamBubble()
-  messages.push({
-    role:      'assistant',
-    content:   full || '(No response)',
-    time:      now(),
-    modelId:   currentModel.id,
-    modelName: currentModel.name,
-  })
-  renderMessages()
-  saveHistory()
+  if (full) {
+    messages.push({ role:'assistant', content:full, time:now(), modelId:currentModel.id, modelName:currentModel.name })
+    renderMessages()
+    saveHistory()
+  } else {
+    showError('No response. Try again.')
+  }
 }
 
-// ============================================================
-// UI HELPERS
-// ============================================================
+// ── UI ──
 function renderMessages() {
-  const container = document.getElementById('messages')
-  container.querySelectorAll('.msg-row,.error-msg').forEach(e => e.remove())
+  const c = document.getElementById('messages')
+  c.querySelectorAll('.msg-row,.error-msg').forEach(e => e.remove())
   document.getElementById('empty-state').style.display = messages.length ? 'none' : 'flex'
-  messages.forEach(msg => container.appendChild(buildBubble(msg)))
-  updateCount()
-  scrollBottom()
+  messages.forEach(msg => c.appendChild(buildBubble(msg)))
+  updateCount(); scrollBottom()
 }
 
 function buildBubble(msg) {
   const row = document.createElement('div')
   row.className = 'msg-row ' + msg.role
-
   if (msg.role === 'assistant') {
     const av = document.createElement('div')
-    av.className = 'avatar'
-    av.style.color = '#ffffff'
+    av.className = 'avatar'; av.style.color = '#fff'
     av.textContent = MODELS.find(m => m.id === msg.modelId)?.emoji || '◈'
     row.appendChild(av)
   }
-
   const bubble = document.createElement('div')
   bubble.className = 'bubble'
   bubble.style.cssText = msg.role === 'user'
     ? 'background:#0c0c0c;border-color:#2a2a2a;border-left:2px solid #3a3a3a'
     : 'background:#080808;border-color:#1a1a1a;border-left:2px solid #ffffff22'
-
   if (msg.role === 'assistant') {
     const tag = document.createElement('div')
     tag.className = 'bubble-model-tag'
     tag.textContent = msg.modelName || currentModel.name
     bubble.appendChild(tag)
   }
-
   const text = document.createElement('div')
-  text.className = 'bubble-text'
-  text.textContent = msg.content
+  text.className = 'bubble-text'; text.textContent = msg.content
   bubble.appendChild(text)
-
   const footer = document.createElement('div')
   footer.className = 'bubble-footer'
-  const time = document.createElement('div')
-  time.className = 'bubble-time'
-  time.textContent = msg.time
+  const time = document.createElement('span')
+  time.className = 'bubble-time'; time.textContent = msg.time
   const copy = document.createElement('button')
-  copy.className = 'copy-btn'
-  copy.textContent = 'COPY'
-  copy.onclick = () => {
-    navigator.clipboard.writeText(msg.content)
-    copy.textContent = 'COPIED ✓'
-    setTimeout(() => copy.textContent = 'COPY', 2000)
-  }
-  footer.appendChild(time)
-  footer.appendChild(copy)
-  bubble.appendChild(footer)
-  row.appendChild(bubble)
-
+  copy.className = 'copy-btn'; copy.textContent = 'COPY'
+  copy.onclick = () => { navigator.clipboard.writeText(msg.content); copy.textContent = 'COPIED ✓'; setTimeout(()=>copy.textContent='COPY',2000) }
+  footer.appendChild(time); footer.appendChild(copy)
+  bubble.appendChild(footer); row.appendChild(bubble)
   if (msg.role === 'user') {
     const av = document.createElement('div')
-    av.className = 'avatar'
-    av.style.cssText = 'color:#606060;font-family:var(--font-hud);font-size:9px'
-    av.textContent = 'U'
-    row.appendChild(av)
+    av.className = 'avatar'; av.style.cssText = 'color:#555;font-size:9px;font-family:var(--font-hud)'
+    av.textContent = 'U'; row.appendChild(av)
   }
   return row
 }
 
 function addStreamBubble() {
-  const container = document.getElementById('messages')
-  document.getElementById('empty-state').style.display = 'none'
+  const c = document.getElementById('messages')
   const row = document.createElement('div')
-  row.className = 'msg-row assistant'
-  row.id = 'stream-row'
+  row.className = 'msg-row assistant'; row.id = 'stream-row'
   const av = document.createElement('div')
-  av.className = 'avatar'
-  av.style.color = '#ffffff'
-  av.textContent = currentModel.emoji
+  av.className = 'avatar'; av.style.color = '#fff'; av.textContent = currentModel.emoji
   row.appendChild(av)
   const bubble = document.createElement('div')
   bubble.className = 'bubble'
   bubble.style.cssText = 'background:#080808;border-color:#1a1a1a;border-left:2px solid #ffffff22'
   const tag = document.createElement('div')
-  tag.className = 'bubble-model-tag'
-  tag.textContent = currentModel.name
+  tag.className = 'bubble-model-tag'; tag.textContent = currentModel.name
   bubble.appendChild(tag)
   const dots = document.createElement('div')
-  dots.className = 'thinking-dots'
-  dots.id = 'thinking'
-  for (let i = 0; i < 3; i++) {
-    const d = document.createElement('span')
-    d.className = 'dot'
-    dots.appendChild(d)
-  }
+  dots.className = 'thinking-dots'; dots.id = 'thinking'
+  for (let i=0;i<3;i++) { const d=document.createElement('span'); d.className='dot'; dots.appendChild(d) }
   bubble.appendChild(dots)
-  const textEl = document.createElement('div')
-  textEl.className = 'bubble-text'
-  textEl.id = 'stream-text'
-  textEl.style.display = 'none'
-  bubble.appendChild(textEl)
+  const t = document.createElement('div')
+  t.className = 'bubble-text'; t.id = 'stream-text'; t.style.display = 'none'
+  bubble.appendChild(t)
   const cur = document.createElement('span')
-  cur.className = 'cursor-blink'
-  cur.id = 'stream-cursor'
-  cur.style.display = 'none'
-  bubble.appendChild(cur)
-  row.appendChild(bubble)
-  container.appendChild(row)
-  scrollBottom()
+  cur.className = 'cursor-blink'; cur.id = 'stream-cursor'; cur.style.display = 'none'
+  bubble.appendChild(cur); row.appendChild(bubble); c.appendChild(row); scrollBottom()
 }
 
 function removeStreamBubble() { document.getElementById('stream-row')?.remove() }
-
 function showError(msg) {
-  const el = document.createElement('div')
-  el.className = 'error-msg'
-  el.textContent = '⚠ ' + msg
-  document.getElementById('messages').appendChild(el)
-  scrollBottom()
+  const el = document.createElement('div'); el.className = 'error-msg'; el.textContent = '⚠ ' + msg
+  document.getElementById('messages').appendChild(el); scrollBottom()
 }
+function scrollBottom() { const m=document.getElementById('messages'); m.scrollTop=m.scrollHeight }
+function updateCount() { document.getElementById('msg-count').textContent = messages.length + ' messages' }
+function saveHistory() { try { localStorage.setItem('synapse-history', JSON.stringify(messages.slice(-60))) } catch {} }
+function now() { return new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) }
+function autoResize(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,120)+'px' }
 
-function scrollBottom() {
-  const m = document.getElementById('messages')
-  m.scrollTop = m.scrollHeight
-}
-
-function updateCount() {
-  document.getElementById('msg-count').textContent = messages.length + ' messages'
-}
-
-function saveHistory() {
-  localStorage.setItem('synapse-history', JSON.stringify(messages.slice(-80)))
-}
-
-function now() {
-  return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-}
-
-function autoResize(el) {
-  el.style.height = 'auto'
-  el.style.height = Math.min(el.scrollHeight, 120) + 'px'
-}
-
-// ── CONTROLS ──
-document.getElementById('clear-btn').addEventListener('click', () => {
-  messages = []
-  localStorage.removeItem('synapse-history')
-  renderMessages()
-})
-
-document.getElementById('settings-btn').addEventListener('click', () => {
-  document.getElementById('settings-panel').classList.toggle('open')
-})
-
-document.getElementById('menu-btn').addEventListener('click', () => {
-  document.getElementById('sidebar').classList.toggle('open')
-})
-
+document.getElementById('clear-btn').addEventListener('click', () => { messages=[]; localStorage.removeItem('synapse-history'); renderMessages() })
+document.getElementById('settings-btn').addEventListener('click', () => document.getElementById('settings-panel').classList.toggle('open'))
+document.getElementById('menu-btn').addEventListener('click', () => document.getElementById('sidebar').classList.toggle('open'))
 document.getElementById('send-btn').addEventListener('click', sendMessage)
-
-document.getElementById('chat-input').addEventListener('keydown', e => {
-  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage() }
-})
-
-document.getElementById('chat-input').addEventListener('input', function() { autoResize(this) })
-
-document.getElementById('temperature').addEventListener('input', e => {
-  document.getElementById('temp-val').textContent = e.target.value
-})
-
-document.getElementById('max-tokens').addEventListener('input', e => {
-  document.getElementById('tokens-val').textContent = e.target.value
-})
+document.getElementById('chat-input').addEventListener('keydown', e => { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage()} })
+document.getElementById('chat-input').addEventListener('input', function(){autoResize(this)})
+document.getElementById('temperature').addEventListener('input', e => document.getElementById('temp-val').textContent = e.target.value)
+document.getElementById('max-tokens').addEventListener('input', e => document.getElementById('tokens-val').textContent = e.target.value)
 
 window.closeSettings = () => document.getElementById('settings-panel').classList.remove('open')
-
-window.fillInput = el => {
-  document.getElementById('chat-input').value = el.textContent
-  document.getElementById('chat-input').focus()
-}
-
+window.fillInput = el => { document.getElementById('chat-input').value = el.textContent; document.getElementById('chat-input').focus() }
 window.exportChat = () => {
-  const text = messages.map(m => `[${m.role.toUpperCase()}] ${m.time}\n${m.content}`).join('\n\n---\n\n')
-  const blob = new Blob([`SYNAPSE AI — Chat Export\nBuilt by Arnav Bhardwaj, CEO/Chairman BhardwajTechnologieS\n${'─'.repeat(50)}\n\n${text}`], { type: 'text/plain' })
-  const a = document.createElement('a')
-  a.href = URL.createObjectURL(blob)
-  a.download = `synapse-chat-${Date.now()}.txt`
-  a.click()
+  const text = messages.map(m=>`[${m.role.toUpperCase()}] ${m.time}\n${m.content}`).join('\n\n---\n\n')
+  const blob = new Blob([`SYNAPSE AI Export\nBuilt by Arnav Bhardwaj, CEO/Chairman BhardwajTechnologieS\n\n${text}`],{type:'text/plain'})
+  const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`synapse-${Date.now()}.txt`; a.click()
 }
 
-// Starfield
-const canvas = document.getElementById('starfield')
-const ctx    = canvas.getContext('2d')
-let stars    = []
-function initStars() {
-  canvas.width  = window.innerWidth
-  canvas.height = window.innerHeight
-  stars = Array.from({ length: 100 }, () => ({
-    x: Math.random() * canvas.width,
-    y: Math.random() * canvas.height,
-    r: Math.random() * 0.9,
-    speed: Math.random() * 0.12 + 0.02,
-    opacity: Math.random() * 0.5 + 0.1
-  }))
+const canvas=document.getElementById('starfield'), ctx=canvas.getContext('2d')
+let stars=[]
+function initStars(){
+  canvas.width=window.innerWidth; canvas.height=window.innerHeight
+  stars=Array.from({length:100},()=>({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*0.9,speed:Math.random()*0.12+0.02,opacity:Math.random()*0.5+0.1}))
 }
-function drawStars() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height)
-  stars.forEach(s => {
-    ctx.beginPath()
-    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2)
-    ctx.fillStyle = `rgba(200,200,200,${s.opacity})`
-    ctx.fill()
-    s.y += s.speed
-    if (s.y > canvas.height) { s.y = 0; s.x = Math.random() * canvas.width }
-  })
+function drawStars(){
+  ctx.clearRect(0,0,canvas.width,canvas.height)
+  stars.forEach(s=>{ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle=`rgba(200,200,200,${s.opacity})`;ctx.fill();s.y+=s.speed;if(s.y>canvas.height){s.y=0;s.x=Math.random()*canvas.width}})
   requestAnimationFrame(drawStars)
 }
 initStars(); drawStars()
 window.addEventListener('resize', initStars)
-
-if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js')
+if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js')
 </script>
 </body>
 </html>
