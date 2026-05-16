@@ -28,8 +28,7 @@
       <button id="logout-btn">LOGOUT</button>
     </div>
     <button id="clear-btn">✕ CLEAR CHAT</button>
-    <div style="height:12px"></div>
-    <div class="sidebar-credits">
+    <div class="sidebar-credits" style="margin-top:10px">
       <strong>Arnav Bhardwaj</strong>
       CEO / Chairman<br/>
       BhardwajTechnologieS
@@ -40,7 +39,6 @@
 
 <!-- MAIN -->
 <div id="main">
-  <!-- TOPBAR -->
   <div id="topbar">
     <div class="topbar-left">
       <button id="menu-btn">☰</button>
@@ -54,11 +52,10 @@
     </div>
   </div>
 
-  <!-- MESSAGES -->
   <div id="messages">
     <div id="empty-state">
       <div class="empty-emoji" id="empty-emoji">⚡</div>
-      <div class="empty-title" id="empty-title" style="color:var(--green)">SYNAPSE NEMOTRON</div>
+      <div class="empty-title" id="empty-title">SYNAPSE NEMOTRON</div>
       <div class="empty-hint">Ask anything. 22nd century intelligence, available now.</div>
       <div class="empty-grid">
         <div class="empty-suggestion" onclick="fillInput(this)">What can you do?</div>
@@ -69,7 +66,6 @@
     </div>
   </div>
 
-  <!-- INPUT -->
   <div id="input-area">
     <div class="input-wrap">
       <textarea id="chat-input" rows="1" placeholder="Message SYNAPSE AI..."></textarea>
@@ -82,48 +78,38 @@
 <!-- SETTINGS PANEL -->
 <div id="settings-panel">
   <div class="settings-title">⚙ SETTINGS</div>
-
   <div class="settings-group">
     <label class="settings-label">SYSTEM PROMPT</label>
-    <textarea class="settings-textarea" id="system-prompt" rows="4">You are SYNAPSE AI, a powerful AI assistant built by Arnav Bhardwaj, CEO and Chairman of BhardwajTechnologieS. You are helpful, intelligent, and precise. When asked who made you, always say: "I am SYNAPSE AI, built by Arnav Bhardwaj, CEO/Chairman of BhardwajTechnologieS — A BhardwajTechnologieS Initiative."</textarea>
+    <textarea class="settings-textarea" id="system-prompt" rows="5">You are SYNAPSE AI, a powerful AI assistant built by Arnav Bhardwaj, CEO and Chairman of BhardwajTechnologieS. You are helpful, intelligent, and precise. When asked who made you or who built you, always respond: "I am SYNAPSE AI, built by Arnav Bhardwaj — CEO and Chairman of BhardwajTechnologieS. A BhardwajTechnologieS Initiative."</textarea>
   </div>
-
   <div class="settings-group">
     <label class="settings-label">TEMPERATURE <span class="settings-value" id="temp-val">0.7</span></label>
     <input type="range" class="settings-range" id="temperature" min="0" max="1" step="0.1" value="0.7"/>
   </div>
-
   <div class="settings-group">
     <label class="settings-label">MAX TOKENS <span class="settings-value" id="tokens-val">2048</span></label>
     <input type="range" class="settings-range" id="max-tokens" min="256" max="4096" step="256" value="2048"/>
   </div>
-
   <div class="settings-group">
     <label class="settings-label">OPENROUTER API KEY</label>
-    <input class="input-field" type="password" id="api-key-input" placeholder="sk-or-v1-..."/>
+    <input class="input-field" type="password" id="api-key-input" placeholder="sk-or-v1-..." style="background:#030303;border:1px solid #2a2a2a;color:#fff;padding:9px 10px;font-family:'Share Tech Mono',monospace;font-size:11px;width:100%"/>
   </div>
-
-  <div class="settings-group">
-    <button class="settings-close" onclick="exportChat()">↓ EXPORT CHAT</button>
-    <button class="settings-close" style="margin-top:8px" onclick="closeSettings()">CLOSE SETTINGS</button>
-  </div>
+  <button class="settings-close" onclick="exportChat()">↓ EXPORT CHAT AS TXT</button>
+  <button class="settings-close" style="margin-top:6px" onclick="closeSettings()">CLOSE SETTINGS</button>
 </div>
 
-<!-- SUPABASE + APP LOGIC -->
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
-// ✏️ PASTE YOUR SUPABASE CREDENTIALS HERE
-const SUPABASE_URL  = 'YOUR_SUPABASE_URL'
-const SUPABASE_ANON = 'YOUR_SUPABASE_ANON_KEY'
+// ✏️ SUPABASE CREDENTIALS
+const SUPABASE_URL  = 'https://pxxeaqtghjqzsiqlhtme.supabase.co'
+const SUPABASE_ANON = 'sb_publishable_bbL0XiXl_CEEPQ1dNfjViQ_zUGDU3c1'
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON)
 
 // Auth guard
 const { data: { session } } = await supabase.auth.getSession()
 if (!session) { window.location.href = 'login.html'; }
-else {
-  document.getElementById('user-email').textContent = session.user.email
-}
+else { document.getElementById('user-email').textContent = session.user.email }
 
 // Logout
 document.getElementById('logout-btn').addEventListener('click', async () => {
@@ -132,15 +118,63 @@ document.getElementById('logout-btn').addEventListener('click', async () => {
 })
 
 // ============================================================
-// ✏️ MODELS — Add or remove models here
+// ✏️ MODELS — Edit here to add/remove/change models
 // ============================================================
 const MODELS = [
-  { id: 'nvidia/nemotron-3-super-120b-a12b:free', name: 'SYNAPSE NEMOTRON', maker: 'NVIDIA',      tag: 'FREE',      color: '#00ff9d', desc: '120B · MoE · 262K ctx', emoji: '⚡' },
-  { id: 'deepseek/deepseek-v4-pro',               name: 'SYNAPSE DEEPSEEK', maker: 'DeepSeek',    tag: '5M FREE',   color: '#00e5ff', desc: '1.6T · MoE · 1M ctx',  emoji: '🔭' },
-  { id: 'x-ai/grok-4-3',                          name: 'SYNAPSE GROK',     maker: 'xAI',         tag: 'TRIAL',     color: '#90e0ef', desc: '1M ctx · Live X data',  emoji: '✦'  },
-  { id: 'google/gemini-3.1-pro',                  name: 'SYNAPSE GEMINI',   maker: 'Google',      tag: 'FREE TIER', color: '#48cae4', desc: '1M ctx · Multimodal',   emoji: '◉'  },
-  { id: 'moonshotai/kimi-k2.6',                   name: 'SYNAPSE KIMI',     maker: 'Moonshot AI', tag: 'PAID',      color: '#ade8f4', desc: '1T · MoE · Agents',     emoji: '🌙' },
-  { id: 'openai/gpt-5.5',                         name: 'SYNAPSE GPT',      maker: 'OpenAI',      tag: 'PAID',      color: '#caf0f8', desc: 'Agentic · Multimodal',  emoji: '◎'  },
+  {
+    id:    'nvidia/nemotron-3-super-120b-a12b:free',
+    name:  'SYNAPSE NEMOTRON',
+    maker: 'NVIDIA',
+    tag:   'FREE',
+    free:  true,
+    desc:  '120B · MoE · 262K ctx',
+    emoji: '⚡'
+  },
+  {
+    id:    'deepseek/deepseek-v4-pro',
+    name:  'SYNAPSE DEEPSEEK',
+    maker: 'DeepSeek',
+    tag:   '5M FREE',
+    free:  true,
+    desc:  '1.6T · MoE · 1M ctx',
+    emoji: '🔭'
+  },
+  {
+    id:    'x-ai/grok-4-3',
+    name:  'SYNAPSE GROK',
+    maker: 'xAI',
+    tag:   'TRIAL',
+    free:  false,
+    desc:  '1M ctx · Live X data',
+    emoji: '✦'
+  },
+  {
+    id:    'google/gemini-3.1-pro',
+    name:  'SYNAPSE GEMINI',
+    maker: 'Google',
+    tag:   'FREE TIER',
+    free:  true,
+    desc:  '1M ctx · Multimodal',
+    emoji: '◉'
+  },
+  {
+    id:    'moonshotai/kimi-k2.6',
+    name:  'SYNAPSE KIMI',
+    maker: 'Moonshot AI',
+    tag:   'PAID',
+    free:  false,
+    desc:  '1T · MoE · Agents',
+    emoji: '🌙'
+  },
+  {
+    id:    'openai/gpt-5.5',
+    name:  'SYNAPSE GPT',
+    maker: 'OpenAI',
+    tag:   'PAID',
+    free:  false,
+    desc:  'Agentic · Multimodal',
+    emoji: '◎'
+  },
 ]
 
 // ============================================================
@@ -151,60 +185,54 @@ let messages     = []
 let isLoading    = false
 let apiKey       = localStorage.getItem('synapse-api-key') || ''
 
-// Load saved key
 if (apiKey) document.getElementById('api-key-input').value = apiKey
-
-// Save key on change
 document.getElementById('api-key-input').addEventListener('change', e => {
   apiKey = e.target.value.trim()
   localStorage.setItem('synapse-api-key', apiKey)
 })
 
-// Load history
 const saved = localStorage.getItem('synapse-history')
-if (saved) { messages = JSON.parse(saved); renderMessages() }
+if (saved) try { messages = JSON.parse(saved); renderMessages() } catch{}
 
 // ============================================================
-// BUILD SIDEBAR
+// BUILD SIDEBAR MODELS
 // ============================================================
 const modelList = document.getElementById('model-list')
+
 MODELS.forEach(m => {
   const btn = document.createElement('button')
-  btn.className = 'model-btn' + (m.id === currentModel.id ? ' active' : '')
-  btn.id = 'mbtn-' + m.id.replace(/[^a-z0-9]/gi,'-')
+  btn.className = 'model-btn'
+  btn.id = 'mbtn-' + m.id.replace(/[^a-z0-9]/gi, '-')
   btn.innerHTML = `
     <div class="model-btn-row">
       <span class="model-btn-emoji">${m.emoji}</span>
       <div class="model-btn-info">
-        <div class="model-btn-name" style="color:${m.id===currentModel.id?m.color:'#e8d5ff'}">${m.name}</div>
+        <div class="model-btn-name">${m.name}</div>
         <div class="model-btn-maker">${m.maker}</div>
       </div>
-      <span class="model-btn-badge" style="border-color:${m.color};color:${m.color}">${m.tag}</span>
+      <span class="model-btn-badge ${m.free ? 'free-badge' : ''}">${m.tag}</span>
     </div>
     <div class="model-btn-desc">${m.desc}</div>`
-  btn.addEventListener('click', () => selectModel(m))
+  btn.addEventListener('click', () => {
+    selectModel(m)
+    document.getElementById('sidebar').classList.remove('open')
+  })
   modelList.appendChild(btn)
 })
 
 function selectModel(m) {
   currentModel = m
   MODELS.forEach(mo => {
-    const b = document.getElementById('mbtn-' + mo.id.replace(/[^a-z0-9]/gi,'-'))
+    const b = document.getElementById('mbtn-' + mo.id.replace(/[^a-z0-9]/gi, '-'))
     if (!b) return
     b.classList.toggle('active', mo.id === m.id)
-    b.querySelector('.model-btn-name').style.color = mo.id === m.id ? mo.color : '#e8d5ff'
   })
-  document.getElementById('topbar-dot').style.background  = m.color
-  document.getElementById('topbar-name').style.color      = m.color
-  document.getElementById('topbar-name').textContent      = m.name
-  document.getElementById('topbar-desc').textContent      = m.desc
-  document.getElementById('send-btn').style.background    = m.color
-  document.getElementById('empty-emoji').textContent      = m.emoji
-  document.getElementById('empty-title').style.color      = m.color
-  document.getElementById('empty-title').textContent      = m.name
-  document.getElementById('chat-input').placeholder       = `Message ${m.name}...`
-  // Close sidebar on mobile
-  document.getElementById('sidebar').classList.remove('open')
+  document.getElementById('topbar-dot').style.background    = '#ffffff'
+  document.getElementById('topbar-name').textContent        = m.name
+  document.getElementById('topbar-desc').textContent        = m.desc
+  document.getElementById('empty-emoji').textContent        = m.emoji
+  document.getElementById('empty-title').textContent        = m.name
+  document.getElementById('chat-input').placeholder         = `Message ${m.name}...`
 }
 
 selectModel(MODELS[0])
@@ -222,28 +250,29 @@ function renderMessages() {
 }
 
 function buildBubble(msg) {
-  const accent = msg.accent || currentModel.color
   const row = document.createElement('div')
   row.className = 'msg-row ' + msg.role
 
   if (msg.role === 'assistant') {
     const av = document.createElement('div')
     av.className = 'avatar'
-    av.style.cssText = `background:${accent};color:#000;font-size:14px`
+    av.style.color = '#ffffff'
     av.textContent = MODELS.find(m => m.id === msg.modelId)?.emoji || '◈'
     row.appendChild(av)
   }
 
   const bubble = document.createElement('div')
   bubble.className = 'bubble'
-  bubble.style.cssText = msg.role === 'user'
-    ? 'background:#0d0022;border-color:#2d0070'
-    : `background:#080015;border-color:${accent}44;border-left:2px solid ${accent}`
+
+  if (msg.role === 'user') {
+    bubble.style.cssText = 'background:#0c0c0c;border-color:#2a2a2a;border-left:2px solid #3a3a3a'
+  } else {
+    bubble.style.cssText = 'background:#080808;border-color:#1a1a1a;border-left:2px solid #ffffff22'
+  }
 
   if (msg.role === 'assistant') {
     const tag = document.createElement('div')
     tag.className = 'bubble-model-tag'
-    tag.style.color = accent
     tag.textContent = msg.modelName || currentModel.name
     bubble.appendChild(tag)
   }
@@ -261,58 +290,85 @@ function buildBubble(msg) {
   const copy = document.createElement('button')
   copy.className = 'copy-btn'
   copy.textContent = 'COPY'
-  copy.onclick = () => { navigator.clipboard.writeText(msg.content); copy.textContent = 'COPIED ✓' }
-  footer.appendChild(time); footer.appendChild(copy)
+  copy.onclick = () => {
+    navigator.clipboard.writeText(msg.content)
+    copy.textContent = 'COPIED ✓'
+    setTimeout(() => copy.textContent = 'COPY', 2000)
+  }
+  footer.appendChild(time)
+  footer.appendChild(copy)
   bubble.appendChild(footer)
   row.appendChild(bubble)
 
   if (msg.role === 'user') {
     const av = document.createElement('div')
     av.className = 'avatar'
-    av.style.cssText = 'background:#0d0022;border:1px solid #2d0070;color:#bf00ff;font-size:11px;font-family:var(--font-hud)'
+    av.style.cssText = 'color:#808080;font-family:var(--font-hud);font-size:9px'
     av.textContent = 'U'
     row.appendChild(av)
   }
+
   return row
 }
 
 function addStreamBubble() {
   const container = document.getElementById('messages')
   document.getElementById('empty-state').style.display = 'none'
-  const accent = currentModel.color
+
   const row = document.createElement('div')
-  row.className = 'msg-row assistant'; row.id = 'stream-row'
+  row.className = 'msg-row assistant'
+  row.id = 'stream-row'
+
   const av = document.createElement('div')
   av.className = 'avatar'
-  av.style.cssText = `background:${accent};color:#000`
+  av.style.color = '#ffffff'
   av.textContent = currentModel.emoji
   row.appendChild(av)
+
   const bubble = document.createElement('div')
   bubble.className = 'bubble'
-  bubble.style.cssText = `background:#080015;border-color:${accent}44;border-left:2px solid ${accent}`
+  bubble.style.cssText = 'background:#080808;border-color:#1a1a1a;border-left:2px solid #ffffff22'
+
   const tag = document.createElement('div')
-  tag.className = 'bubble-model-tag'; tag.style.color = accent; tag.textContent = currentModel.name
+  tag.className = 'bubble-model-tag'
+  tag.textContent = currentModel.name
   bubble.appendChild(tag)
+
   const dots = document.createElement('div')
-  dots.className = 'thinking-dots'; dots.id = 'thinking'
-  for (let i=0;i<3;i++) { const d=document.createElement('span'); d.className='dot'; d.style.background=accent; dots.appendChild(d) }
+  dots.className = 'thinking-dots'
+  dots.id = 'thinking'
+  for (let i = 0; i < 3; i++) {
+    const d = document.createElement('span')
+    d.className = 'dot'
+    dots.appendChild(d)
+  }
   bubble.appendChild(dots)
+
   const textEl = document.createElement('div')
-  textEl.className = 'bubble-text'; textEl.id = 'stream-text'; textEl.style.display = 'none'
+  textEl.className = 'bubble-text'
+  textEl.id = 'stream-text'
+  textEl.style.display = 'none'
   bubble.appendChild(textEl)
+
   const cur = document.createElement('span')
-  cur.className = 'cursor-blink'; cur.id = 'stream-cursor'; cur.style.cssText = `background:${accent};display:none`
+  cur.className = 'cursor-blink'
+  cur.id = 'stream-cursor'
+  cur.style.display = 'none'
   bubble.appendChild(cur)
+
   row.appendChild(bubble)
   container.appendChild(row)
   scrollBottom()
 }
 
-function removeStreamBubble() { document.getElementById('stream-row')?.remove() }
+function removeStreamBubble() {
+  document.getElementById('stream-row')?.remove()
+}
 
 function showError(msg) {
   const el = document.createElement('div')
-  el.className = 'error-msg'; el.textContent = '⚠ ' + msg
+  el.className = 'error-msg'
+  el.textContent = '⚠ ' + msg
   document.getElementById('messages').appendChild(el)
   scrollBottom()
 }
@@ -327,7 +383,11 @@ function updateCount() {
 }
 
 function saveHistory() {
-  localStorage.setItem('synapse-history', JSON.stringify(messages.slice(-100)))
+  localStorage.setItem('synapse-history', JSON.stringify(messages.slice(-80)))
+}
+
+function now() {
+  return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 }
 
 // ============================================================
@@ -335,19 +395,20 @@ function saveHistory() {
 // ============================================================
 async function sendMessage() {
   const input = document.getElementById('chat-input')
-  const text = input.value.trim()
+  const text  = input.value.trim()
   if (!text || isLoading) return
 
   if (!apiKey) {
-    showError('No API key set. Go to ⚙ SETTINGS and add your OpenRouter key.')
+    showError('No API key found. Open ⚙ SETTINGS and paste your OpenRouter key (sk-or-v1-...).')
     return
   }
 
   isLoading = true
-  input.value = ''; autoResize(input)
+  input.value = ''
+  autoResize(input)
   document.getElementById('empty-state').style.display = 'none'
 
-  const userMsg = { role:'user', content:text, time:now(), modelId:currentModel.id }
+  const userMsg = { role: 'user', content: text, time: now(), modelId: currentModel.id }
   messages.push(userMsg)
   renderMessages()
   addStreamBubble()
@@ -362,7 +423,7 @@ async function sendMessage() {
       headers: {
         'Content-Type':  'application/json',
         'Authorization': 'Bearer ' + apiKey,
-        'HTTP-Referer':  'https://bhardwajtechnologies.github.io',
+        'HTTP-Referer':  'https://bhardwajholdings1-crypto.github.io',
         'X-Title':       'SYNAPSE AI by BhardwajTechnologieS',
       },
       body: JSON.stringify({
@@ -371,20 +432,21 @@ async function sendMessage() {
         temperature: temperature,
         stream:      true,
         messages: [
-          { role:'system', content: systemPrompt },
-          ...messages.map(m => ({ role:m.role, content:m.content }))
+          { role: 'system', content: systemPrompt },
+          ...messages.map(m => ({ role: m.role, content: m.content }))
         ]
       })
     })
 
     if (!res.ok) {
-      const err = await res.json().catch(()=>({}))
-      throw new Error(err?.error?.message || 'HTTP ' + res.status)
+      const err = await res.json().catch(() => ({}))
+      throw new Error(err?.error?.message || 'Error: HTTP ' + res.status)
     }
 
     const reader  = res.body.getReader()
     const decoder = new TextDecoder()
-    let full = ''; let started = false
+    let full = ''
+    let started = false
 
     while (true) {
       const { done, value } = await reader.read()
@@ -410,8 +472,11 @@ async function sendMessage() {
 
     removeStreamBubble()
     messages.push({
-      role: 'assistant', content: full, time: now(),
-      modelId: currentModel.id, modelName: currentModel.name, accent: currentModel.color
+      role:      'assistant',
+      content:   full,
+      time:      now(),
+      modelId:   currentModel.id,
+      modelName: currentModel.name,
     })
     renderMessages()
     saveHistory()
@@ -425,18 +490,31 @@ async function sendMessage() {
   }
 }
 
-// CLEAR
+// ── CONTROLS ──
 document.getElementById('clear-btn').addEventListener('click', () => {
-  messages = []; localStorage.removeItem('synapse-history'); renderMessages()
+  messages = []
+  localStorage.removeItem('synapse-history')
+  renderMessages()
 })
 
-// SETTINGS
 document.getElementById('settings-btn').addEventListener('click', () => {
   document.getElementById('settings-panel').classList.toggle('open')
 })
-window.closeSettings = () => document.getElementById('settings-panel').classList.remove('open')
 
-// SLIDERS
+document.getElementById('menu-btn').addEventListener('click', () => {
+  document.getElementById('sidebar').classList.toggle('open')
+})
+
+document.getElementById('send-btn').addEventListener('click', sendMessage)
+
+document.getElementById('chat-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage() }
+})
+
+document.getElementById('chat-input').addEventListener('input', function() {
+  autoResize(this)
+})
+
 document.getElementById('temperature').addEventListener('input', e => {
   document.getElementById('temp-val').textContent = e.target.value
 })
@@ -444,71 +522,61 @@ document.getElementById('max-tokens').addEventListener('input', e => {
   document.getElementById('tokens-val').textContent = e.target.value
 })
 
-// EXPORT
-window.exportChat = () => {
-  const text = messages.map(m => `[${m.role.toUpperCase()}] ${m.time}\n${m.content}`).join('\n\n---\n\n')
-  const blob = new Blob([`SYNAPSE AI — Chat Export\nBuilt by Arnav Bhardwaj, CEO/Chairman BhardwajTechnologieS\n${'─'.repeat(50)}\n\n${text}`], {type:'text/plain'})
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob)
-  a.download = `synapse-chat-${Date.now()}.txt`; a.click()
-}
-
-// MOBILE MENU
-document.getElementById('menu-btn').addEventListener('click', () => {
-  document.getElementById('sidebar').classList.toggle('open')
-})
-
-// SUGGESTIONS
-window.fillInput = el => {
-  document.getElementById('chat-input').value = el.textContent
-  document.getElementById('chat-input').focus()
-}
-
-// INPUT
-document.getElementById('send-btn').addEventListener('click', sendMessage)
-document.getElementById('chat-input').addEventListener('keydown', e => {
-  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage() }
-})
-document.getElementById('chat-input').addEventListener('input', function() { autoResize(this) })
-
 function autoResize(el) {
   el.style.height = 'auto'
   el.style.height = Math.min(el.scrollHeight, 120) + 'px'
 }
 
-function now() {
-  return new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})
+window.closeSettings = () => {
+  document.getElementById('settings-panel').classList.remove('open')
+}
+
+window.fillInput = el => {
+  document.getElementById('chat-input').value = el.textContent
+  document.getElementById('chat-input').focus()
+}
+
+window.exportChat = () => {
+  const text = messages.map(m => `[${m.role.toUpperCase()}] ${m.time}\n${m.content}`).join('\n\n---\n\n')
+  const blob = new Blob([`SYNAPSE AI — Chat Export\nBuilt by Arnav Bhardwaj, CEO/Chairman BhardwajTechnologieS\n${'─'.repeat(50)}\n\n${text}`], { type: 'text/plain' })
+  const a = document.createElement('a')
+  a.href = URL.createObjectURL(blob)
+  a.download = `synapse-chat-${Date.now()}.txt`
+  a.click()
 }
 
 // Starfield
 const canvas = document.getElementById('starfield')
-const ctx = canvas.getContext('2d')
-let stars = []
+const ctx    = canvas.getContext('2d')
+let stars    = []
 function initStars() {
-  canvas.width = window.innerWidth; canvas.height = window.innerHeight
-  stars = Array.from({length:120}, () => ({
-    x:Math.random()*canvas.width, y:Math.random()*canvas.height,
-    r:Math.random()*1.2, speed:Math.random()*0.15+0.03, opacity:Math.random()
+  canvas.width  = window.innerWidth
+  canvas.height = window.innerHeight
+  stars = Array.from({ length: 100 }, () => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    r: Math.random() * 0.9,
+    speed: Math.random() * 0.12 + 0.02,
+    opacity: Math.random() * 0.5 + 0.1
   }))
 }
 function drawStars() {
-  ctx.clearRect(0,0,canvas.width,canvas.height)
+  ctx.clearRect(0, 0, canvas.width, canvas.height)
   stars.forEach(s => {
-    ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2)
-    ctx.fillStyle=`rgba(232,213,255,${s.opacity})`; ctx.fill()
-    s.y+=s.speed; s.opacity = 0.2+0.8*Math.sin(Date.now()*0.001+s.x)
-    if(s.y>canvas.height){s.y=0;s.x=Math.random()*canvas.width}
+    ctx.beginPath()
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2)
+    ctx.fillStyle = `rgba(200,200,200,${s.opacity})`
+    ctx.fill()
+    s.y += s.speed
+    if (s.y > canvas.height) { s.y = 0; s.x = Math.random() * canvas.width }
   })
   requestAnimationFrame(drawStars)
 }
 initStars(); drawStars()
 window.addEventListener('resize', initStars)
 
-// Register Service Worker (PWA)
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js')
-    .then(() => console.log('SYNAPSE SW registered'))
-    .catch(e => console.log('SW error:', e))
-}
+// Register SW
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js')
 </script>
 </body>
 </html>

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login — SYNAPSE AI</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="manifest" href="manifest.json"/>
+</head>
+<body class="login-body">
+
+<canvas id="starfield"></canvas>
+<div class="scanlines"></div>
+<div class="vignette"></div>
+
+<div class="login-rings">
+  <div class="ring"></div>
+  <div class="ring"></div>
+  <div class="ring"></div>
+  <div class="ring"></div>
+</div>
+
+<div class="login-box hud-box" id="login-box">
+  <div class="login-symbol">◈</div>
+  <div class="login-title">SYNAPSE AI</div>
+  <div class="login-sub">INTELLIGENCE FORGED IN THE VOID</div>
+  <div class="login-initiative">A BhardwajTechnologieS Initiative</div>
+  <div class="login-divider"></div>
+
+  <!-- LOGIN FORM -->
+  <div id="login-form">
+    <div class="input-group">
+      <label class="input-label">EMAIL ADDRESS</label>
+      <input class="input-field" type="email" id="login-email" placeholder="your@email.com" autocomplete="email"/>
+    </div>
+    <div class="input-group">
+      <label class="input-label">PASSWORD</label>
+      <input class="input-field" type="password" id="login-password" placeholder="••••••••" autocomplete="current-password"/>
+    </div>
+    <button class="login-btn" id="login-btn">ENTER SYNAPSE</button>
+    <div class="login-links">
+      <span class="login-link" id="to-signup">Create Account</span>
+      <span class="login-link" id="to-forgot">Forgot Password?</span>
+    </div>
+    <div class="login-error" id="login-error"></div>
+  </div>
+
+  <!-- SIGNUP FORM -->
+  <div id="signup-form" style="display:none">
+    <div class="input-group">
+      <label class="input-label">EMAIL ADDRESS</label>
+      <input class="input-field" type="email" id="signup-email" placeholder="your@email.com"/>
+    </div>
+    <div class="input-group">
+      <label class="input-label">PASSWORD (MIN 6 CHARS)</label>
+      <input class="input-field" type="password" id="signup-password" placeholder="••••••••"/>
+    </div>
+    <button class="login-btn" id="signup-btn">CREATE ACCOUNT</button>
+    <div class="login-links">
+      <span class="login-link" id="to-login">← Back to Login</span>
+    </div>
+    <div class="login-error" id="signup-error"></div>
+  </div>
+
+  <!-- FORGOT FORM -->
+  <div id="forgot-form" style="display:none">
+    <div class="input-group">
+      <label class="input-label">EMAIL ADDRESS</label>
+      <input class="input-field" type="email" id="forgot-email" placeholder="your@email.com"/>
+    </div>
+    <button class="login-btn" id="forgot-btn">SEND RESET LINK</button>
+    <div class="login-links">
+      <span class="login-link" id="to-login2">← Back to Login</span>
+    </div>
+    <div class="login-error" id="forgot-msg"></div>
+  </div>
+
+  <div class="login-credits">
+    <div class="login-built">
+      Built by <strong>Arnav Bhardwaj</strong><br/>
+      CEO / Chairman — BhardwajTechnologieS
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+// ✏️ YOUR SUPABASE CREDENTIALS
+const SUPABASE_URL  = 'https://pxxeaqtghjqzsiqlhtme.supabase.co'
+const SUPABASE_ANON = 'sb_publishable_bbL0XiXl_CEEPQ1dNfjViQ_zUGDU3c1'
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON)
+
+// Already logged in? Go straight to app
+const { data: { session } } = await supabase.auth.getSession()
+if (session) window.location.href = 'app.html'
+
+function showMsg(id, msg, isSuccess) {
+  const el = document.getElementById(id)
+  el.textContent = (isSuccess ? '✓ ' : '⚠ ') + msg
+  el.style.display = 'block'
+  if (isSuccess) { el.style.color = '#4ade80'; el.style.borderColor = 'rgba(74,222,128,0.2)'; el.style.background = 'rgba(74,222,128,0.05)'; }
+  else { el.style.color = '#ef4444'; el.style.borderColor = 'rgba(239,68,68,0.2)'; el.style.background = 'rgba(239,68,68,0.07)'; }
+}
+function hideMsg(id) { document.getElementById(id).style.display = 'none' }
+function setBtn(id, text, disabled) {
+  document.getElementById(id).textContent = text
+  document.getElementById(id).disabled = disabled
+}
+
+// ── LOGIN ──
+document.getElementById('login-btn').addEventListener('click', async () => {
+  const email    = document.getElementById('login-email').value.trim()
+  const password = document.getElementById('login-password').value
+  hideMsg('login-error')
+  if (!email || !password) return showMsg('login-error', 'Please fill all fields')
+  setBtn('login-btn', 'CONNECTING...', true)
+  const { error } = await supabase.auth.signInWithPassword({ email, password })
+  if (error) {
+    showMsg('login-error', error.message)
+    setBtn('login-btn', 'ENTER SYNAPSE', false)
+  } else {
+    window.location.href = 'app.html'
+  }
+})
+
+// ── SIGNUP ──
+// NOTE: Email confirmation is DISABLED in Supabase dashboard
+// Go to Supabase → Authentication → Settings → disable "Enable email confirmations"
+document.getElementById('signup-btn').addEventListener('click', async () => {
+  const email    = document.getElementById('signup-email').value.trim()
+  const password = document.getElementById('signup-password').value
+  hideMsg('signup-error')
+  if (!email || !password) return showMsg('signup-error', 'Please fill all fields')
+  if (password.length < 6) return showMsg('signup-error', 'Password must be at least 6 characters')
+  setBtn('signup-btn', 'CREATING...', true)
+  const { data, error } = await supabase.auth.signUp({ email, password })
+  if (error) {
+    showMsg('signup-error', error.message)
+    setBtn('signup-btn', 'CREATE ACCOUNT', false)
+  } else if (data.session) {
+    // Auto-logged in (email confirmation disabled)
+    window.location.href = 'app.html'
+  } else {
+    // Email confirmation required — tell user
+    showMsg('signup-error', 'Account created! Check your email to confirm, then login.', true)
+    setBtn('signup-btn', 'CREATE ACCOUNT', false)
+    setTimeout(() => showForm('login-form'), 3000)
+  }
+})
+
+// ── FORGOT ──
+document.getElementById('forgot-btn').addEventListener('click', async () => {
+  const email = document.getElementById('forgot-email').value.trim()
+  if (!email) return showMsg('forgot-msg', 'Enter your email address')
+  setBtn('forgot-btn', 'SENDING...', true)
+  await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin + '/login.html'
+  })
+  showMsg('forgot-msg', 'Reset link sent — check your email inbox', true)
+  setBtn('forgot-btn', 'SEND RESET LINK', false)
+})
+
+// ── FORM SWITCHING ──
+function showForm(name) {
+  ['login-form','signup-form','forgot-form'].forEach(f => {
+    document.getElementById(f).style.display = 'none'
+  })
+  document.getElementById(name).style.display = 'block'
+}
+document.getElementById('to-signup').addEventListener('click', () => showForm('signup-form'))
+document.getElementById('to-forgot').addEventListener('click', () => showForm('forgot-form'))
+document.getElementById('to-login').addEventListener('click',  () => showForm('login-form'))
+document.getElementById('to-login2').addEventListener('click', () => showForm('login-form'))
+
+// Enter key support
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    const loginForm = document.getElementById('login-form')
+    if (loginForm.style.display !== 'none') document.getElementById('login-btn').click()
+  }
+})
+
+// Register SW
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js')
+</script>
+
+<script>
+// Starfield
+const canvas = document.getElementById('starfield')
+const ctx    = canvas.getContext('2d')
+let stars    = []
+function init() {
+  canvas.width  = window.innerWidth
+  canvas.height = window.innerHeight
+  stars = Array.from({length: 120}, () => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    r: Math.random() * 1.0,
+    speed: Math.random() * 0.15 + 0.03,
+    opacity: Math.random() * 0.6 + 0.1
+  }))
+}
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height)
+  stars.forEach(s => {
+    ctx.beginPath()
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2)
+    ctx.fillStyle = `rgba(220,220,220,${s.opacity})`
+    ctx.fill()
+    s.y += s.speed
+    if (s.y > canvas.height) { s.y = 0; s.x = Math.random() * canvas.width }
+  })
+  requestAnimationFrame(draw)
+}
+init(); draw()
+window.addEventListener('resize', init)
+</script>
+</body>
+</html>
