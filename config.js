@@ -14,8 +14,8 @@ window.SYNAPSE_CONFIG = {
   },
 
   // ✏️ Real keys added on GitHub.com after push
-  openrouter: ['OPENROUTER_KEY'],
-  gemini:      'GEMINI_KEY',
+  openrouter: ['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'],
+  gemini:      'AIzaSyDjrPQT34ZvccIyIXAyg2kDiD7LhypxcbY',
 
   referer: 'https://bhardwajholdings1-crypto.github.io',
 }
