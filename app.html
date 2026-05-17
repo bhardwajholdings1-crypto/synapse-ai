@@ -90,536 +90,357 @@
   <button class="settings-close" style="margin-top:6px" onclick="closeSettings()">CLOSE SETTINGS</button>
 </div>
 
-<script type="module">
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
-
-const CFG      = window.SYNAPSE_CONFIG
-const supabase = createClient(CFG.supabase.url, CFG.supabase.anon)
-
-<<<<<<< HEAD
-// Auth guard
-=======
-// Auth
->>>>>>> a9d0faf3a00e0f3996fd75a9021bed212310e86e
-const { data: { session } } = await supabase.auth.getSession()
-if (!session) { window.location.href = 'login.html' }
-else { document.getElementById('user-email').textContent = session.user.email }
-
-document.getElementById('logout-btn').addEventListener('click', async () => {
-  await supabase.auth.signOut()
-  window.location.href = 'login.html'
-})
-
-<<<<<<< HEAD
-// Load keys from Netlify function securely
-let OR_KEY = ''
-let GM_KEY = ''
-
-try {
-  const res  = await fetch('/.netlify/functions/keys')
-  const text = await res.text()
-  eval(text)
-  OR_KEY = window.SYNAPSE_KEYS?.openrouter || ''
-  GM_KEY = window.SYNAPSE_KEYS?.gemini     || ''
-} catch(e) {
-  console.log('Keys not loaded:', e)
-}
-
-// MODELS
-=======
-// ============================================================
-// MODELS — all verified working IDs
-// ============================================================
->>>>>>> a9d0faf3a00e0f3996fd75a9021bed212310e86e
-const MODELS = [
-  {
-    id:    'nvidia/nemotron-3-super-120b-a12b:free',
-    name:  'SYNAPSE NEMOTRON',
-    maker: 'NVIDIA',
-    tag:   'FREE', free: true,
-    desc:  '120B · MoE · 262K ctx',
-<<<<<<< HEAD
-    emoji: '⚡', route: 'openrouter'
-=======
-    emoji: '⚡',
-    route: 'openrouter'
->>>>>>> a9d0faf3a00e0f3996fd75a9021bed212310e86e
-  },
-  {
-    id:    'deepseek/deepseek-chat:free',
-    name:  'SYNAPSE DEEPSEEK',
-    maker: 'DeepSeek',
-    tag:   'FREE', free: true,
-    desc:  'DeepSeek V3 · Free',
-<<<<<<< HEAD
-    emoji: '🔭', route: 'openrouter'
-=======
-    emoji: '🔭',
-    route: 'openrouter'
->>>>>>> a9d0faf3a00e0f3996fd75a9021bed212310e86e
-  },
-  {
-    id:    'x-ai/grok-2-1212',
-    name:  'SYNAPSE GROK',
-    maker: 'xAI',
-    tag:   'PAID', free: false,
-    desc:  '131K ctx · Reasoning',
-<<<<<<< HEAD
-    emoji: '✦', route: 'openrouter'
-=======
-    emoji: '✦',
-    route: 'openrouter'
->>>>>>> a9d0faf3a00e0f3996fd75a9021bed212310e86e
-  },
-  {
-    id:    'gemini-1.5-flash-latest',
-    name:  'SYNAPSE GEMINI',
-    maker: 'Google',
-    tag:   'FREE', free: true,
-    desc:  '1M ctx · Multimodal',
-<<<<<<< HEAD
-    emoji: '◉', route: 'gemini'
-  },
-  {
-    id:    'meta-llama/llama-3.3-70b-instruct:free',
-    name:  'SYNAPSE LLAMA',
-    maker: 'Meta',
-    tag:   'FREE', free: true,
-    desc:  'Llama 3.3 · 70B · Free',
-    emoji: '🌙', route: 'openrouter'
-=======
-    emoji: '◉',
-    route: 'gemini'
-  },
-  {
-    id:    'meta-llama/llama-3.3-70b-instruct:free',
-    name:  'SYNAPSE KIMI',
-    maker: 'Meta',
-    tag:   'FREE', free: true,
-    desc:  'Llama 3.3 · 70B · Free',
-    emoji: '🌙',
-    route: 'openrouter'
->>>>>>> a9d0faf3a00e0f3996fd75a9021bed212310e86e
-  },
-  {
-    id:    'openai/gpt-4o-mini',
-    name:  'SYNAPSE GPT',
-    maker: 'OpenAI',
-    tag:   'PAID', free: false,
-    desc:  'GPT-4o Mini · Fast',
-<<<<<<< HEAD
-    emoji: '◎', route: 'openrouter'
-  },
-]
-
-=======
-    emoji: '◎',
-    route: 'openrouter'
-  },
-]
-
-// State
->>>>>>> a9d0faf3a00e0f3996fd75a9021bed212310e86e
-let currentModel = MODELS[0]
-let messages     = []
-let isLoading    = false
-
-try {
-  const h = localStorage.getItem('synapse-history')
-  if (h) { messages = JSON.parse(h); renderMessages() }
-} catch {}
-
-// Build sidebar
-MODELS.forEach(m => {
-  const btn = document.createElement('button')
-  btn.className = 'model-btn'
-  btn.id = 'mbtn-' + m.id.replace(/[^a-z0-9]/gi, '-')
-  btn.innerHTML = `
-    <div class="model-btn-row">
-      <span class="model-btn-emoji">${m.emoji}</span>
-      <div class="model-btn-info">
-        <div class="model-btn-name">${m.name}</div>
-        <div class="model-btn-maker">${m.maker}</div>
-      </div>
-      <span class="model-btn-badge ${m.free ? 'free-badge' : ''}">${m.tag}</span>
-    </div>
-    <div class="model-btn-desc">${m.desc}</div>`
-  btn.addEventListener('click', () => {
-    selectModel(m)
-    document.getElementById('sidebar').classList.remove('open')
-  })
-  document.getElementById('model-list').appendChild(btn)
-})
-
-function selectModel(m) {
-  currentModel = m
-  MODELS.forEach(mo => {
-    const b = document.getElementById('mbtn-' + mo.id.replace(/[^a-z0-9]/gi, '-'))
-    if (b) b.classList.toggle('active', mo.id === m.id)
-  })
-  document.getElementById('topbar-name').textContent = m.name
-  document.getElementById('topbar-desc').textContent = m.desc
-  document.getElementById('empty-emoji').textContent = m.emoji
-  document.getElementById('empty-title').textContent = m.name
-  document.getElementById('chat-input').placeholder  = 'Message ' + m.name + '...'
-}
-selectModel(MODELS[0])
-
-// Send message
-async function sendMessage() {
-  const input = document.getElementById('chat-input')
-  const text  = input.value.trim()
-  if (!text || isLoading) return
-
-  isLoading = true
-  input.value = ''
-  autoResize(input)
-  document.getElementById('send-btn').disabled = true
-  document.getElementById('empty-state').style.display = 'none'
-
-  messages.push({ role: 'user', content: text, time: now(), modelId: currentModel.id })
-  renderMessages()
-  addStreamBubble()
-
-  const sys  = document.getElementById('system-prompt').value
-  const temp = parseFloat(document.getElementById('temperature').value)
-  const maxt = parseInt(document.getElementById('max-tokens').value)
-
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+(async function init() {
   try {
-    if (currentModel.route === 'gemini') {
-      await callGemini(sys, temp, maxt)
-    } else {
-      await callOpenRouter(sys, temp, maxt)
-    }
-  } catch(e) {
-    removeStreamBubble()
-    showError(e.message)
-  } finally {
-    isLoading = false
-    document.getElementById('send-btn').disabled = false
-    input.focus()
-  }
-}
+    const CFG      = window.SYNAPSE_CONFIG
+    const supabase = window.supabase.createClient(CFG.supabase.url, CFG.supabase.anon)
 
-<<<<<<< HEAD
-async function callOpenRouter(sys, temp, maxt) {
-  if (!OR_KEY) throw new Error('OpenRouter key not configured in Netlify environment variables.')
-=======
-// OpenRouter
-async function callOpenRouter(sys, temp, maxt) {
-  const key = CFG.openrouter[0]
->>>>>>> a9d0faf3a00e0f3996fd75a9021bed212310e86e
-  const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type':  'application/json',
-<<<<<<< HEAD
-      'Authorization': 'Bearer ' + OR_KEY,
-=======
-      'Authorization': 'Bearer ' + key,
->>>>>>> a9d0faf3a00e0f3996fd75a9021bed212310e86e
-      'HTTP-Referer':  CFG.referer,
-      'X-Title':       'SYNAPSE AI',
-    },
-    body: JSON.stringify({
-      model:       currentModel.id,
-      max_tokens:  maxt,
-      temperature: temp,
-      stream:      true,
-      messages: [
-        { role: 'system', content: sys },
-        ...messages.map(m => ({ role: m.role, content: m.content }))
-      ]
+    // Auth guard
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session) { window.location.href = 'login.html'; return }
+    document.getElementById('user-email').textContent = session.user.email
+
+    document.getElementById('logout-btn').addEventListener('click', async () => {
+      await supabase.auth.signOut()
+      window.location.href = 'login.html'
     })
-  })
-  if (!res.ok) {
-    const e = await res.json().catch(() => ({}))
-    throw new Error(e?.error?.message || 'OpenRouter Error ' + res.status)
-  }
-  await readStream(res, 'openrouter')
-}
 
-// Gemini — using v1 API (stable)
-async function callGemini(sys, temp, maxt) {
-<<<<<<< HEAD
-  if (!GM_KEY) throw new Error('Gemini key not configured in Netlify environment variables.')
-  const contents = messages
-    .filter(m => m.content)
-    .map(m => ({ role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.content }] }))
+    // Load keys from Netlify function securely
+    let OR_KEY = ''
+    let GM_KEY = ''
+    try {
+      const res  = await fetch('/.netlify/functions/keys')
+      const text = await res.text()
+      eval(text)
+      OR_KEY = window.SYNAPSE_KEYS?.openrouter || ''
+      GM_KEY = window.SYNAPSE_KEYS?.gemini     || ''
+    } catch(e) {
+      console.log('Keys not loaded from Netlify function:', e)
+    }
 
-  const res = await fetch(
-    'https://generativelanguage.googleapis.com/v1/models/' + currentModel.id + ':streamGenerateContent?key=' + GM_KEY + '&alt=sse',
-=======
-  const key = CFG.gemini
-  const contents = messages
-    .filter(m => m.content)
-    .map(m => ({
-      role:  m.role === 'assistant' ? 'model' : 'user',
-      parts: [{ text: m.content }]
-    }))
+    // Models
+    const MODELS = [
+      { id: 'nvidia/nemotron-3-super-120b-a12b:free', name: 'SYNAPSE NEMOTRON', maker: 'NVIDIA',      tag: 'FREE', free: true,  desc: '120B · MoE · 262K ctx',    emoji: '⚡', route: 'openrouter' },
+      { id: 'deepseek/deepseek-chat:free',            name: 'SYNAPSE DEEPSEEK', maker: 'DeepSeek',    tag: 'FREE', free: true,  desc: 'DeepSeek V3 · Free',       emoji: '🔭', route: 'openrouter' },
+      { id: 'x-ai/grok-2-1212',                      name: 'SYNAPSE GROK',     maker: 'xAI',         tag: 'PAID', free: false, desc: '131K ctx · Reasoning',      emoji: '✦',  route: 'openrouter' },
+      { id: 'gemini-1.5-flash-latest',               name: 'SYNAPSE GEMINI',   maker: 'Google',      tag: 'FREE', free: true,  desc: '1M ctx · Multimodal',       emoji: '◉',  route: 'gemini'     },
+      { id: 'meta-llama/llama-3.3-70b-instruct:free',name: 'SYNAPSE LLAMA',    maker: 'Meta',        tag: 'FREE', free: true,  desc: 'Llama 3.3 · 70B · Free',   emoji: '🌙', route: 'openrouter' },
+      { id: 'openai/gpt-4o-mini',                    name: 'SYNAPSE GPT',      maker: 'OpenAI',      tag: 'PAID', free: false, desc: 'GPT-4o Mini · Fast',        emoji: '◎',  route: 'openrouter' },
+    ]
 
-  const res = await fetch(
-    'https://generativelanguage.googleapis.com/v1/models/' + currentModel.id + ':streamGenerateContent?key=' + key + '&alt=sse',
->>>>>>> a9d0faf3a00e0f3996fd75a9021bed212310e86e
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        system_instruction: { parts: [{ text: sys }] },
-<<<<<<< HEAD
-        contents,
-        generationConfig: { temperature: temp, maxOutputTokens: maxt }
-=======
-        contents: contents,
-        generationConfig: {
-          temperature:     temp,
-          maxOutputTokens: maxt,
-        }
->>>>>>> a9d0faf3a00e0f3996fd75a9021bed212310e86e
+    let currentModel = MODELS[0]
+    let messages     = []
+    let isLoading    = false
+
+    try {
+      const h = localStorage.getItem('synapse-history')
+      if (h) { messages = JSON.parse(h); renderMessages() }
+    } catch {}
+
+    // Build sidebar
+    MODELS.forEach(m => {
+      const btn = document.createElement('button')
+      btn.className = 'model-btn'
+      btn.id = 'mbtn-' + m.id.replace(/[^a-z0-9]/gi, '-')
+      btn.innerHTML = `
+        <div class="model-btn-row">
+          <span class="model-btn-emoji">${m.emoji}</span>
+          <div class="model-btn-info">
+            <div class="model-btn-name">${m.name}</div>
+            <div class="model-btn-maker">${m.maker}</div>
+          </div>
+          <span class="model-btn-badge ${m.free ? 'free-badge' : ''}">${m.tag}</span>
+        </div>
+        <div class="model-btn-desc">${m.desc}</div>`
+      btn.addEventListener('click', () => {
+        selectModel(m)
+        document.getElementById('sidebar').classList.remove('open')
       })
-    }
-  )
-  if (!res.ok) {
-    const e = await res.json().catch(() => ({}))
-    throw new Error(e?.error?.message || 'Gemini Error ' + res.status)
-  }
-  await readStream(res, 'gemini')
-}
-
-// Stream reader
-async function readStream(res, type) {
-  const reader  = res.body.getReader()
-  const decoder = new TextDecoder()
-  let full = '', started = false
-  while (true) {
-    const { done, value } = await reader.read()
-    if (done) break
-    const lines = decoder.decode(value).split('\n').filter(l => l.startsWith('data: '))
-    for (const line of lines) {
-      const raw = line.slice(6).trim()
-      if (raw === '[DONE]') continue
-      try {
-        const p = JSON.parse(raw)
-        const delta = type === 'gemini'
-          ? (p.candidates?.[0]?.content?.parts?.[0]?.text || '')
-          : (p.choices?.[0]?.delta?.content || '')
-        full += delta
-        if (!started && full.length > 0) {
-          started = true
-          document.getElementById('thinking').style.display      = 'none'
-          document.getElementById('stream-text').style.display   = 'block'
-          document.getElementById('stream-cursor').style.display = 'inline-block'
-        }
-        document.getElementById('stream-text').textContent = full
-        scrollBottom()
-      } catch {}
-    }
-  }
-  removeStreamBubble()
-  if (full.length > 0) {
-<<<<<<< HEAD
-    messages.push({ role: 'assistant', content: full, time: now(), modelId: currentModel.id, modelName: currentModel.name })
-    renderMessages()
-    saveHistory()
-  } else {
-    showError('No response. Please try again.')
-  }
-}
-
-=======
-    messages.push({
-      role: 'assistant', content: full, time: now(),
-      modelId: currentModel.id, modelName: currentModel.name
+      document.getElementById('model-list').appendChild(btn)
     })
-    renderMessages()
-    saveHistory()
-  } else {
-    showError('No response received. Please try again.')
+
+    function selectModel(m) {
+      currentModel = m
+      MODELS.forEach(mo => {
+        const b = document.getElementById('mbtn-' + mo.id.replace(/[^a-z0-9]/gi, '-'))
+        if (b) b.classList.toggle('active', mo.id === m.id)
+      })
+      document.getElementById('topbar-name').textContent = m.name
+      document.getElementById('topbar-desc').textContent = m.desc
+      document.getElementById('empty-emoji').textContent = m.emoji
+      document.getElementById('empty-title').textContent = m.name
+      document.getElementById('chat-input').placeholder  = 'Message ' + m.name + '...'
+    }
+    selectModel(MODELS[0])
+
+    // Send message
+    async function sendMessage() {
+      const input = document.getElementById('chat-input')
+      const text  = input.value.trim()
+      if (!text || isLoading) return
+      isLoading = true
+      input.value = ''
+      autoResize(input)
+      document.getElementById('send-btn').disabled = true
+      document.getElementById('empty-state').style.display = 'none'
+      messages.push({ role: 'user', content: text, time: now(), modelId: currentModel.id })
+      renderMessages()
+      addStreamBubble()
+      const sys  = document.getElementById('system-prompt').value
+      const temp = parseFloat(document.getElementById('temperature').value)
+      const maxt = parseInt(document.getElementById('max-tokens').value)
+      try {
+        if (currentModel.route === 'gemini') {
+          await callGemini(sys, temp, maxt)
+        } else {
+          await callOpenRouter(sys, temp, maxt)
+        }
+      } catch(e) {
+        removeStreamBubble()
+        showError(e.message)
+      } finally {
+        isLoading = false
+        document.getElementById('send-btn').disabled = false
+        input.focus()
+      }
+    }
+
+    async function callOpenRouter(sys, temp, maxt) {
+      if (!OR_KEY) throw new Error('OpenRouter key not configured. Add it in Netlify environment variables.')
+      const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type':  'application/json',
+          'Authorization': 'Bearer ' + OR_KEY,
+          'HTTP-Referer':  CFG.referer,
+          'X-Title':       'SYNAPSE AI',
+        },
+        body: JSON.stringify({
+          model:       currentModel.id,
+          max_tokens:  maxt,
+          temperature: temp,
+          stream:      true,
+          messages: [
+            { role: 'system', content: sys },
+            ...messages.map(m => ({ role: m.role, content: m.content }))
+          ]
+        })
+      })
+      if (!res.ok) {
+        const e = await res.json().catch(() => ({}))
+        throw new Error(e?.error?.message || 'OpenRouter Error ' + res.status)
+      }
+      await readStream(res, 'openrouter')
+    }
+
+    async function callGemini(sys, temp, maxt) {
+      if (!GM_KEY) throw new Error('Gemini key not configured. Add it in Netlify environment variables.')
+      const contents = messages
+        .filter(m => m.content)
+        .map(m => ({ role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.content }] }))
+      const res = await fetch(
+        'https://generativelanguage.googleapis.com/v1/models/' + currentModel.id + ':streamGenerateContent?key=' + GM_KEY + '&alt=sse',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            system_instruction: { parts: [{ text: sys }] },
+            contents,
+            generationConfig: { temperature: temp, maxOutputTokens: maxt }
+          })
+        }
+      )
+      if (!res.ok) {
+        const e = await res.json().catch(() => ({}))
+        throw new Error(e?.error?.message || 'Gemini Error ' + res.status)
+      }
+      await readStream(res, 'gemini')
+    }
+
+    async function readStream(res, type) {
+      const reader  = res.body.getReader()
+      const decoder = new TextDecoder()
+      let full = '', started = false
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+        const lines = decoder.decode(value).split('\n').filter(l => l.startsWith('data: '))
+        for (const line of lines) {
+          const raw = line.slice(6).trim()
+          if (raw === '[DONE]') continue
+          try {
+            const p = JSON.parse(raw)
+            const delta = type === 'gemini'
+              ? (p.candidates?.[0]?.content?.parts?.[0]?.text || '')
+              : (p.choices?.[0]?.delta?.content || '')
+            full += delta
+            if (!started && full.length > 0) {
+              started = true
+              document.getElementById('thinking').style.display      = 'none'
+              document.getElementById('stream-text').style.display   = 'block'
+              document.getElementById('stream-cursor').style.display = 'inline-block'
+            }
+            document.getElementById('stream-text').textContent = full
+            scrollBottom()
+          } catch {}
+        }
+      }
+      removeStreamBubble()
+      if (full.length > 0) {
+        messages.push({ role: 'assistant', content: full, time: now(), modelId: currentModel.id, modelName: currentModel.name })
+        renderMessages()
+        saveHistory()
+      } else {
+        showError('No response. Please try again.')
+      }
+    }
+
+    function renderMessages() {
+      const c = document.getElementById('messages')
+      c.querySelectorAll('.msg-row, .error-msg').forEach(e => e.remove())
+      document.getElementById('empty-state').style.display = messages.length ? 'none' : 'flex'
+      messages.forEach(msg => c.appendChild(buildBubble(msg)))
+      updateCount()
+      scrollBottom()
+    }
+
+    function buildBubble(msg) {
+      const row = document.createElement('div')
+      row.className = 'msg-row ' + msg.role
+      if (msg.role === 'assistant') {
+        const av = document.createElement('div')
+        av.className = 'avatar'
+        av.style.color = '#fff'
+        av.textContent = MODELS.find(m => m.id === msg.modelId)?.emoji || '◈'
+        row.appendChild(av)
+      }
+      const bubble = document.createElement('div')
+      bubble.className = 'bubble'
+      bubble.style.cssText = msg.role === 'user'
+        ? 'background:#0c0c0c;border-color:#2a2a2a;border-left:2px solid #3a3a3a'
+        : 'background:#080808;border-color:#1a1a1a;border-left:2px solid #ffffff22'
+      if (msg.role === 'assistant') {
+        const tag = document.createElement('div')
+        tag.className = 'bubble-model-tag'
+        tag.textContent = msg.modelName || currentModel.name
+        bubble.appendChild(tag)
+      }
+      const text = document.createElement('div')
+      text.className = 'bubble-text'
+      text.textContent = msg.content
+      bubble.appendChild(text)
+      const footer = document.createElement('div')
+      footer.className = 'bubble-footer'
+      const time = document.createElement('span')
+      time.className = 'bubble-time'
+      time.textContent = msg.time
+      const copy = document.createElement('button')
+      copy.className = 'copy-btn'
+      copy.textContent = 'COPY'
+      copy.onclick = () => {
+        navigator.clipboard.writeText(msg.content)
+        copy.textContent = 'COPIED ✓'
+        setTimeout(() => copy.textContent = 'COPY', 2000)
+      }
+      footer.appendChild(time)
+      footer.appendChild(copy)
+      bubble.appendChild(footer)
+      row.appendChild(bubble)
+      if (msg.role === 'user') {
+        const av = document.createElement('div')
+        av.className = 'avatar'
+        av.style.cssText = 'color:#555;font-size:9px;font-family:var(--font-hud)'
+        av.textContent = 'U'
+        row.appendChild(av)
+      }
+      return row
+    }
+
+    function addStreamBubble() {
+      const c   = document.getElementById('messages')
+      const row = document.createElement('div')
+      row.className = 'msg-row assistant'
+      row.id = 'stream-row'
+      const av = document.createElement('div')
+      av.className = 'avatar'
+      av.style.color = '#fff'
+      av.textContent = currentModel.emoji
+      row.appendChild(av)
+      const bubble = document.createElement('div')
+      bubble.className = 'bubble'
+      bubble.style.cssText = 'background:#080808;border-color:#1a1a1a;border-left:2px solid #ffffff22'
+      const tag = document.createElement('div')
+      tag.className = 'bubble-model-tag'
+      tag.textContent = currentModel.name
+      bubble.appendChild(tag)
+      const dots = document.createElement('div')
+      dots.className = 'thinking-dots'
+      dots.id = 'thinking'
+      for (let i = 0; i < 3; i++) {
+        const d = document.createElement('span')
+        d.className = 'dot'
+        dots.appendChild(d)
+      }
+      bubble.appendChild(dots)
+      const t = document.createElement('div')
+      t.className = 'bubble-text'
+      t.id = 'stream-text'
+      t.style.display = 'none'
+      bubble.appendChild(t)
+      const cur = document.createElement('span')
+      cur.className = 'cursor-blink'
+      cur.id = 'stream-cursor'
+      cur.style.display = 'none'
+      bubble.appendChild(cur)
+      row.appendChild(bubble)
+      c.appendChild(row)
+      scrollBottom()
+    }
+
+    function removeStreamBubble() { document.getElementById('stream-row')?.remove() }
+    function showError(msg) {
+      const el = document.createElement('div')
+      el.className = 'error-msg'
+      el.textContent = '⚠ ' + msg
+      document.getElementById('messages').appendChild(el)
+      scrollBottom()
+    }
+    function scrollBottom() { const m = document.getElementById('messages'); m.scrollTop = m.scrollHeight }
+    function updateCount() { document.getElementById('msg-count').textContent = messages.length + ' messages' }
+    function saveHistory() { try { localStorage.setItem('synapse-history', JSON.stringify(messages.slice(-60))) } catch {} }
+    function now() { return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }
+    function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120) + 'px' }
+
+    document.getElementById('clear-btn').addEventListener('click', () => { messages = []; localStorage.removeItem('synapse-history'); renderMessages() })
+    document.getElementById('settings-btn').addEventListener('click', () => document.getElementById('settings-panel').classList.toggle('open'))
+    document.getElementById('menu-btn').addEventListener('click', () => document.getElementById('sidebar').classList.toggle('open'))
+    document.getElementById('send-btn').addEventListener('click', sendMessage)
+    document.getElementById('chat-input').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage() } })
+    document.getElementById('chat-input').addEventListener('input', function() { autoResize(this) })
+    document.getElementById('temperature').addEventListener('input', e => document.getElementById('temp-val').textContent = e.target.value)
+    document.getElementById('max-tokens').addEventListener('input', e => document.getElementById('tokens-val').textContent = e.target.value)
+
+    window.closeSettings = () => document.getElementById('settings-panel').classList.remove('open')
+    window.fillInput = el => { document.getElementById('chat-input').value = el.textContent; document.getElementById('chat-input').focus() }
+    window.exportChat = () => {
+      const text = messages.map(m => '[' + m.role.toUpperCase() + '] ' + m.time + '\n' + m.content).join('\n\n---\n\n')
+      const blob = new Blob(['SYNAPSE AI Export\nBuilt by Arnav Bhardwaj, CEO/Chairman BhardwajTechnologieS\n\n' + text], { type: 'text/plain' })
+      const a = document.createElement('a')
+      a.href = URL.createObjectURL(blob)
+      a.download = 'synapse-' + Date.now() + '.txt'
+      a.click()
+    }
+
+  } catch(err) {
+    console.error('SYNAPSE app init error:', err)
   }
-}
+})()
+</script>
 
-// UI functions
->>>>>>> a9d0faf3a00e0f3996fd75a9021bed212310e86e
-function renderMessages() {
-  const c = document.getElementById('messages')
-  c.querySelectorAll('.msg-row, .error-msg').forEach(e => e.remove())
-  document.getElementById('empty-state').style.display = messages.length ? 'none' : 'flex'
-  messages.forEach(msg => c.appendChild(buildBubble(msg)))
-  updateCount()
-  scrollBottom()
-}
-
-function buildBubble(msg) {
-  const row = document.createElement('div')
-  row.className = 'msg-row ' + msg.role
-  if (msg.role === 'assistant') {
-    const av = document.createElement('div')
-    av.className = 'avatar'
-    av.style.color = '#fff'
-    av.textContent = MODELS.find(m => m.id === msg.modelId)?.emoji || '◈'
-    row.appendChild(av)
-  }
-  const bubble = document.createElement('div')
-  bubble.className = 'bubble'
-  bubble.style.cssText = msg.role === 'user'
-    ? 'background:#0c0c0c;border-color:#2a2a2a;border-left:2px solid #3a3a3a'
-    : 'background:#080808;border-color:#1a1a1a;border-left:2px solid #ffffff22'
-  if (msg.role === 'assistant') {
-    const tag = document.createElement('div')
-    tag.className = 'bubble-model-tag'
-    tag.textContent = msg.modelName || currentModel.name
-    bubble.appendChild(tag)
-  }
-  const text = document.createElement('div')
-  text.className = 'bubble-text'
-  text.textContent = msg.content
-  bubble.appendChild(text)
-  const footer = document.createElement('div')
-  footer.className = 'bubble-footer'
-  const time = document.createElement('span')
-  time.className = 'bubble-time'
-  time.textContent = msg.time
-  const copy = document.createElement('button')
-<<<<<<< HEAD
-  copy.className = 'copy-btn'; copy.textContent = 'COPY'
-  copy.onclick = () => { navigator.clipboard.writeText(msg.content); copy.textContent = 'COPIED ✓'; setTimeout(() => copy.textContent = 'COPY', 2000) }
-  footer.appendChild(time); footer.appendChild(copy)
-  bubble.appendChild(footer); row.appendChild(bubble)
-=======
-  copy.className = 'copy-btn'
-  copy.textContent = 'COPY'
-  copy.onclick = () => {
-    navigator.clipboard.writeText(msg.content)
-    copy.textContent = 'COPIED ✓'
-    setTimeout(() => copy.textContent = 'COPY', 2000)
-  }
-  footer.appendChild(time)
-  footer.appendChild(copy)
-  bubble.appendChild(footer)
-  row.appendChild(bubble)
->>>>>>> a9d0faf3a00e0f3996fd75a9021bed212310e86e
-  if (msg.role === 'user') {
-    const av = document.createElement('div')
-    av.className = 'avatar'
-    av.style.cssText = 'color:#555;font-size:9px;font-family:var(--font-hud)'
-    av.textContent = 'U'
-    row.appendChild(av)
-  }
-  return row
-}
-
-function addStreamBubble() {
-  const c   = document.getElementById('messages')
-  const row = document.createElement('div')
-  row.className = 'msg-row assistant'
-  row.id = 'stream-row'
-  const av = document.createElement('div')
-  av.className = 'avatar'
-  av.style.color = '#fff'
-  av.textContent = currentModel.emoji
-  row.appendChild(av)
-  const bubble = document.createElement('div')
-  bubble.className = 'bubble'
-  bubble.style.cssText = 'background:#080808;border-color:#1a1a1a;border-left:2px solid #ffffff22'
-  const tag = document.createElement('div')
-  tag.className = 'bubble-model-tag'
-  tag.textContent = currentModel.name
-  bubble.appendChild(tag)
-  const dots = document.createElement('div')
-<<<<<<< HEAD
-  dots.className = 'thinking-dots'; dots.id = 'thinking'
-  for (let i = 0; i < 3; i++) { const d = document.createElement('span'); d.className = 'dot'; dots.appendChild(d) }
-=======
-  dots.className = 'thinking-dots'
-  dots.id = 'thinking'
-  for (let i = 0; i < 3; i++) {
-    const d = document.createElement('span')
-    d.className = 'dot'
-    dots.appendChild(d)
-  }
->>>>>>> a9d0faf3a00e0f3996fd75a9021bed212310e86e
-  bubble.appendChild(dots)
-  const t = document.createElement('div')
-  t.className = 'bubble-text'
-  t.id = 'stream-text'
-  t.style.display = 'none'
-  bubble.appendChild(t)
-  const cur = document.createElement('span')
-  cur.className = 'cursor-blink'
-  cur.id = 'stream-cursor'
-  cur.style.display = 'none'
-  bubble.appendChild(cur)
-  row.appendChild(bubble)
-  c.appendChild(row)
-  scrollBottom()
-}
-
-function removeStreamBubble() { document.getElementById('stream-row')?.remove() }
-function showError(msg) {
-  const el = document.createElement('div')
-  el.className = 'error-msg'
-  el.textContent = '⚠ ' + msg
-  document.getElementById('messages').appendChild(el)
-  scrollBottom()
-}
-function scrollBottom() { const m = document.getElementById('messages'); m.scrollTop = m.scrollHeight }
-function updateCount() { document.getElementById('msg-count').textContent = messages.length + ' messages' }
-<<<<<<< HEAD
-function saveHistory() { try { localStorage.setItem('synapse-history', JSON.stringify(messages.slice(-60))) } catch {} }
-function now() { return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }
-function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120) + 'px' }
-
-document.getElementById('clear-btn').addEventListener('click', () => { messages = []; localStorage.removeItem('synapse-history'); renderMessages() })
-document.getElementById('settings-btn').addEventListener('click', () => document.getElementById('settings-panel').classList.toggle('open'))
-document.getElementById('menu-btn').addEventListener('click', () => document.getElementById('sidebar').classList.toggle('open'))
-document.getElementById('send-btn').addEventListener('click', sendMessage)
-document.getElementById('chat-input').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage() } })
-document.getElementById('chat-input').addEventListener('input', function() { autoResize(this) })
-document.getElementById('temperature').addEventListener('input', e => document.getElementById('temp-val').textContent = e.target.value)
-document.getElementById('max-tokens').addEventListener('input', e => document.getElementById('tokens-val').textContent = e.target.value)
-=======
-function saveHistory() {
-  try { localStorage.setItem('synapse-history', JSON.stringify(messages.slice(-60))) } catch {}
-}
-function now() { return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }
-function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120) + 'px' }
-
-document.getElementById('clear-btn').addEventListener('click', () => {
-  messages = []
-  localStorage.removeItem('synapse-history')
-  renderMessages()
-})
-document.getElementById('settings-btn').addEventListener('click', () => {
-  document.getElementById('settings-panel').classList.toggle('open')
-})
-document.getElementById('menu-btn').addEventListener('click', () => {
-  document.getElementById('sidebar').classList.toggle('open')
-})
-document.getElementById('send-btn').addEventListener('click', sendMessage)
-document.getElementById('chat-input').addEventListener('keydown', e => {
-  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage() }
-})
-document.getElementById('chat-input').addEventListener('input', function() { autoResize(this) })
-document.getElementById('temperature').addEventListener('input', e => {
-  document.getElementById('temp-val').textContent = e.target.value
-})
-document.getElementById('max-tokens').addEventListener('input', e => {
-  document.getElementById('tokens-val').textContent = e.target.value
-})
-
->>>>>>> a9d0faf3a00e0f3996fd75a9021bed212310e86e
-window.closeSettings = () => document.getElementById('settings-panel').classList.remove('open')
-window.fillInput = el => {
-  document.getElementById('chat-input').value = el.textContent
-  document.getElementById('chat-input').focus()
-}
-window.exportChat = () => {
-  const text = messages.map(m => '[' + m.role.toUpperCase() + '] ' + m.time + '\n' + m.content).join('\n\n---\n\n')
-  const blob = new Blob(['SYNAPSE AI Export\nBuilt by Arnav Bhardwaj, CEO/Chairman BhardwajTechnologieS\n\n' + text], { type: 'text/plain' })
-<<<<<<< HEAD
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'synapse-' + Date.now() + '.txt'; a.click()
-}
-
+<script>
+// Starfield
 const canvas = document.getElementById('starfield'), ctx = canvas.getContext('2d')
 let stars = []
 function initStars() {
@@ -633,46 +454,6 @@ function drawStars() {
 }
 initStars(); drawStars(); window.addEventListener('resize', initStars)
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js')
-=======
-  const a = document.createElement('a')
-  a.href = URL.createObjectURL(blob)
-  a.download = 'synapse-' + Date.now() + '.txt'
-  a.click()
-}
-
-// Starfield
-const canvas = document.getElementById('starfield')
-const ctx    = canvas.getContext('2d')
-let stars    = []
-function initStars() {
-  canvas.width  = window.innerWidth
-  canvas.height = window.innerHeight
-  stars = Array.from({ length: 100 }, () => ({
-    x: Math.random() * canvas.width,
-    y: Math.random() * canvas.height,
-    r: Math.random() * 0.9,
-    speed: Math.random() * 0.12 + 0.02,
-    opacity: Math.random() * 0.5 + 0.1
-  }))
-}
-function drawStars() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height)
-  stars.forEach(s => {
-    ctx.beginPath()
-    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2)
-    ctx.fillStyle = 'rgba(200,200,200,' + s.opacity + ')'
-    ctx.fill()
-    s.y += s.speed
-    if (s.y > canvas.height) { s.y = 0; s.x = Math.random() * canvas.width }
-  })
-  requestAnimationFrame(drawStars)
-}
-initStars()
-drawStars()
-window.addEventListener('resize', initStars)
-
-if ('serviceWorker' in navigator) navigator.serviceWorker.register('/synapse-ai/sw.js')
->>>>>>> a9d0faf3a00e0f3996fd75a9021bed212310e86e
 </script>
 </body>
 </html>
