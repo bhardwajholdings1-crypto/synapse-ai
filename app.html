@@ -122,12 +122,12 @@
 
     // Models
     const MODELS = [
-      { id: 'nvidia/nemotron-3-super-120b-a12b:free', name: 'SYNAPSE NEMOTRON', maker: 'NVIDIA',      tag: 'FREE', free: true,  desc: '120B · MoE · 262K ctx',    emoji: '⚡', route: 'openrouter' },
-      { id: 'deepseek/deepseek-chat:free',            name: 'SYNAPSE DEEPSEEK', maker: 'DeepSeek',    tag: 'FREE', free: true,  desc: 'DeepSeek V3 · Free',       emoji: '🔭', route: 'openrouter' },
-      { id: 'x-ai/grok-2-1212',                      name: 'SYNAPSE GROK',     maker: 'xAI',         tag: 'PAID', free: false, desc: '131K ctx · Reasoning',      emoji: '✦',  route: 'openrouter' },
-      { id: 'gemini-1.5-flash-latest',               name: 'SYNAPSE GEMINI',   maker: 'Google',      tag: 'FREE', free: true,  desc: '1M ctx · Multimodal',       emoji: '◉',  route: 'gemini'     },
-      { id: 'meta-llama/llama-3.3-70b-instruct:free',name: 'SYNAPSE LLAMA',    maker: 'Meta',        tag: 'FREE', free: true,  desc: 'Llama 3.3 · 70B · Free',   emoji: '🌙', route: 'openrouter' },
-      { id: 'openai/gpt-4o-mini',                    name: 'SYNAPSE GPT',      maker: 'OpenAI',      tag: 'PAID', free: false, desc: 'GPT-4o Mini · Fast',        emoji: '◎',  route: 'openrouter' },
+      { id: 'nvidia/nemotron-3-super-120b-a12b:free',  name: 'SYNAPSE NEMOTRON', maker: 'NVIDIA',    tag: 'FREE', free: true,  desc: '120B · MoE · 262K ctx',  emoji: '⚡', route: 'openrouter' },
+      { id: 'deepseek/deepseek-r1:free',               name: 'SYNAPSE DEEPSEEK', maker: 'DeepSeek',  tag: 'FREE', free: true,  desc: 'DeepSeek R1 · Free',     emoji: '🔭', route: 'openrouter' },
+      { id: 'x-ai/grok-3-mini-beta',                   name: 'SYNAPSE GROK',     maker: 'xAI',       tag: 'PAID', free: false, desc: 'Grok 3 Mini · Fast',     emoji: '✦',  route: 'openrouter' },
+      { id: 'gemini-1.5-flash',                        name: 'SYNAPSE GEMINI',   maker: 'Google',    tag: 'FREE', free: true,  desc: '1M ctx · Multimodal',    emoji: '◉',  route: 'gemini'     },
+      { id: 'meta-llama/llama-3.3-70b-instruct:free',  name: 'SYNAPSE LLAMA',    maker: 'Meta',      tag: 'FREE', free: true,  desc: 'Llama 3.3 · 70B · Free', emoji: '🌙', route: 'openrouter' },
+      { id: 'openai/gpt-4o-mini',                      name: 'SYNAPSE GPT',      maker: 'OpenAI',    tag: 'PAID', free: false, desc: 'GPT-4o Mini · Fast',     emoji: '◎',  route: 'openrouter' },
     ]
 
     let currentModel = MODELS[0]
@@ -246,7 +246,7 @@
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            system_instruction: { parts: [{ text: sys }] },
+            systemInstruction: { parts: [{ text: sys }] },
             contents,
             generationConfig: { temperature: temp, maxOutputTokens: maxt }
           })
