@@ -13,7 +13,7 @@ window.SYNAPSE_CONFIG = {
     anon: 'sb_publishable_bbL0XiXl_CEEPQ1dNfjViQ_zUGDU3c1',
   },
 
-  openrouter: ['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'],
+  openrouter: ['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'],
 
   gemini: 'AIzaSyDjrPQT34ZvccIyIXAyg2kDiD7LhypxcbY',
 
