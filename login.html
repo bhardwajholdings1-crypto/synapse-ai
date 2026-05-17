@@ -68,59 +68,95 @@
     <div class="login-built">Built by <strong>Arnav Bhardwaj</strong><br/>CEO / Chairman — BhardwajTechnologieS</div>
   </div>
 </div>
-<script type="module">
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
-const CFG = window.SYNAPSE_CONFIG
-const supabase = createClient(CFG.supabase.url, CFG.supabase.anon)
-const { data: { session } } = await supabase.auth.getSession()
-if (session) window.location.href = 'app.html'
-function msg(id, text, ok) {
-  const el = document.getElementById(id)
-  el.textContent = (ok ? '✓ ' : '⚠ ') + text
-  el.style.cssText = `display:block;color:${ok?'#4ade80':'#ef4444'}`
-}
-function btn(id, text, off) { const b = document.getElementById(id); b.textContent = text; b.disabled = off }
-function form(name) {
-  ['login-form','signup-form','forgot-form'].forEach(f => document.getElementById(f).style.display = 'none')
-  document.getElementById(name).style.display = 'block'
-}
-document.getElementById('login-btn').addEventListener('click', async () => {
-  const email = document.getElementById('login-email').value.trim()
-  const pass  = document.getElementById('login-password').value
-  document.getElementById('login-error').style.display = 'none'
-  if (!email || !pass) return msg('login-error', 'Please fill all fields')
-  btn('login-btn', 'CONNECTING...', true)
-  const { error } = await supabase.auth.signInWithPassword({ email, password: pass })
-  if (error) { msg('login-error', error.message); btn('login-btn', 'ENTER SYNAPSE', false) }
-  else window.location.href = 'app.html'
-})
-document.getElementById('signup-btn').addEventListener('click', async () => {
-  const email = document.getElementById('signup-email').value.trim()
-  const pass  = document.getElementById('signup-password').value
-  document.getElementById('signup-error').style.display = 'none'
-  if (!email || !pass) return msg('signup-error', 'Please fill all fields')
-  if (pass.length < 6) return msg('signup-error', 'Password must be at least 6 characters')
-  btn('signup-btn', 'CREATING...', true)
-  const { data, error } = await supabase.auth.signUp({ email, password: pass })
-  if (error) { msg('signup-error', error.message); btn('signup-btn', 'CREATE ACCOUNT', false) }
-  else if (data.session) window.location.href = 'app.html'
-  else { msg('signup-error', 'Account created! Login now.', true); btn('signup-btn', 'CREATE ACCOUNT', false); setTimeout(() => form('login-form'), 2000) }
-})
-document.getElementById('forgot-btn').addEventListener('click', async () => {
-  const email = document.getElementById('forgot-email').value.trim()
-  if (!email) return msg('forgot-msg', 'Enter your email')
-  btn('forgot-btn', 'SENDING...', true)
-  await supabase.auth.resetPasswordForEmail(email)
-  msg('forgot-msg', 'Reset link sent!', true)
-  btn('forgot-btn', 'SEND RESET LINK', false)
-})
-document.getElementById('to-signup').addEventListener('click',  () => form('signup-form'))
-document.getElementById('to-forgot').addEventListener('click',  () => form('forgot-form'))
-document.getElementById('to-login').addEventListener('click',   () => form('login-form'))
-document.getElementById('to-login2').addEventListener('click',  () => form('login-form'))
-document.addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('login-btn').click() })
-</script>
+
+<!-- FIX: Supabase loaded as a plain script (no module), then init() wraps the
+     top-level await so a network error never silently kills the event listeners -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
+(async function init() {
+  try {
+    const CFG      = window.SYNAPSE_CONFIG
+    const supabase = window.supabase.createClient(CFG.supabase.url, CFG.supabase.anon)
+
+    // If already logged in, skip straight to app
+    const { data: { session } } = await supabase.auth.getSession()
+    if (session) { window.location.href = 'app.html'; return }
+
+    // ── helpers ──────────────────────────────────────────────────────────────
+    function msg(id, text, ok) {
+      const el = document.getElementById(id)
+      el.textContent = (ok ? '✓ ' : '⚠ ') + text
+      el.style.cssText = `display:block;color:${ok ? '#4ade80' : '#ef4444'}`
+    }
+    function btn(id, text, off) {
+      const b = document.getElementById(id)
+      b.textContent = text
+      b.disabled = off
+    }
+    function form(name) {
+      ['login-form', 'signup-form', 'forgot-form'].forEach(f =>
+        document.getElementById(f).style.display = 'none'
+      )
+      document.getElementById(name).style.display = 'block'
+    }
+
+    // ── LOGIN ─────────────────────────────────────────────────────────────────
+    document.getElementById('login-btn').addEventListener('click', async () => {
+      const email = document.getElementById('login-email').value.trim()
+      const pass  = document.getElementById('login-password').value
+      document.getElementById('login-error').style.display = 'none'
+      if (!email || !pass) return msg('login-error', 'Please fill all fields')
+      btn('login-btn', 'CONNECTING...', true)
+      const { error } = await supabase.auth.signInWithPassword({ email, password: pass })
+      if (error) { msg('login-error', error.message); btn('login-btn', 'ENTER SYNAPSE', false) }
+      else window.location.href = 'app.html'
+    })
+
+    // ── SIGNUP ────────────────────────────────────────────────────────────────
+    document.getElementById('signup-btn').addEventListener('click', async () => {
+      const email = document.getElementById('signup-email').value.trim()
+      const pass  = document.getElementById('signup-password').value
+      document.getElementById('signup-error').style.display = 'none'
+      if (!email || !pass) return msg('signup-error', 'Please fill all fields')
+      if (pass.length < 6) return msg('signup-error', 'Password must be at least 6 characters')
+      btn('signup-btn', 'CREATING...', true)
+      const { data, error } = await supabase.auth.signUp({ email, password: pass })
+      if (error) { msg('signup-error', error.message); btn('signup-btn', 'CREATE ACCOUNT', false) }
+      else if (data.session) window.location.href = 'app.html'
+      else {
+        msg('signup-error', 'Account created! Login now.', true)
+        btn('signup-btn', 'CREATE ACCOUNT', false)
+        setTimeout(() => form('login-form'), 2000)
+      }
+    })
+
+    // ── FORGOT ────────────────────────────────────────────────────────────────
+    document.getElementById('forgot-btn').addEventListener('click', async () => {
+      const email = document.getElementById('forgot-email').value.trim()
+      if (!email) return msg('forgot-msg', 'Enter your email')
+      btn('forgot-btn', 'SENDING...', true)
+      await supabase.auth.resetPasswordForEmail(email)
+      msg('forgot-msg', 'Reset link sent!', true)
+      btn('forgot-btn', 'SEND RESET LINK', false)
+    })
+
+    // ── FORM SWITCHING ────────────────────────────────────────────────────────
+    document.getElementById('to-signup').addEventListener('click',  () => form('signup-form'))
+    document.getElementById('to-forgot').addEventListener('click',  () => form('forgot-form'))
+    document.getElementById('to-login').addEventListener('click',   () => form('login-form'))
+    document.getElementById('to-login2').addEventListener('click',  () => form('login-form'))
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Enter') document.getElementById('login-btn').click()
+    })
+
+  } catch (err) {
+    console.error('SYNAPSE login init error:', err)
+  }
+})()
+</script>
+
+<script>
+// Starfield — untouched
 const canvas = document.getElementById('starfield'), ctx = canvas.getContext('2d')
 let stars = []
 function init() {
