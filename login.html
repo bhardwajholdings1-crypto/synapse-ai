@@ -9,23 +9,19 @@
   <script src="config.js"></script>
 </head>
 <body class="login-body">
-
 <canvas id="starfield"></canvas>
 <div class="scanlines"></div>
 <div class="vignette"></div>
-
 <div class="login-rings">
   <div class="ring"></div><div class="ring"></div>
   <div class="ring"></div><div class="ring"></div>
 </div>
-
 <div class="login-box hud-box">
   <div class="login-symbol">◈</div>
   <div class="login-title">SYNAPSE AI</div>
   <div class="login-sub">INTELLIGENCE FORGED IN THE VOID</div>
   <div class="login-initiative">A BhardwajTechnologieS Initiative</div>
   <div class="login-divider"></div>
-
   <div id="login-form">
     <div class="input-group">
       <label class="input-label">EMAIL ADDRESS</label>
@@ -42,7 +38,6 @@
     </div>
     <div class="login-error" id="login-error"></div>
   </div>
-
   <div id="signup-form" style="display:none">
     <div class="input-group">
       <label class="input-label">EMAIL ADDRESS</label>
@@ -58,7 +53,6 @@
     </div>
     <div class="login-error" id="signup-error"></div>
   </div>
-
   <div id="forgot-form" style="display:none">
     <div class="input-group">
       <label class="input-label">EMAIL ADDRESS</label>
@@ -70,88 +64,75 @@
     </div>
     <div class="login-error" id="forgot-msg"></div>
   </div>
-
   <div class="login-credits">
-    <div class="login-built">
-      Built by <strong>Arnav Bhardwaj</strong><br/>
-      CEO / Chairman — BhardwajTechnologieS
-    </div>
+    <div class="login-built">Built by <strong>Arnav Bhardwaj</strong><br/>CEO / Chairman — BhardwajTechnologieS</div>
   </div>
 </div>
-
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 const CFG = window.SYNAPSE_CONFIG
 const supabase = createClient(CFG.supabase.url, CFG.supabase.anon)
-
 const { data: { session } } = await supabase.auth.getSession()
 if (session) window.location.href = 'app.html'
-
 function msg(id, text, ok) {
   const el = document.getElementById(id)
-  el.textContent = (ok?'✓ ':'⚠ ') + text
-  el.style.cssText = `display:block;color:${ok?'#4ade80':'#ef4444'};background:${ok?'rgba(74,222,128,0.05)':'rgba(239,68,68,0.07)'};border-color:${ok?'rgba(74,222,128,0.2)':'rgba(239,68,68,0.2)'}`
+  el.textContent = (ok ? '✓ ' : '⚠ ') + text
+  el.style.cssText = `display:block;color:${ok?'#4ade80':'#ef4444'}`
 }
-function btn(id, text, off) { const b=document.getElementById(id); b.textContent=text; b.disabled=off }
+function btn(id, text, off) { const b = document.getElementById(id); b.textContent = text; b.disabled = off }
 function form(name) {
-  ['login-form','signup-form','forgot-form'].forEach(f => document.getElementById(f).style.display='none')
+  ['login-form','signup-form','forgot-form'].forEach(f => document.getElementById(f).style.display = 'none')
   document.getElementById(name).style.display = 'block'
 }
-
 document.getElementById('login-btn').addEventListener('click', async () => {
   const email = document.getElementById('login-email').value.trim()
   const pass  = document.getElementById('login-password').value
   document.getElementById('login-error').style.display = 'none'
-  if (!email||!pass) return msg('login-error','Please fill all fields')
-  btn('login-btn','CONNECTING...',true)
+  if (!email || !pass) return msg('login-error', 'Please fill all fields')
+  btn('login-btn', 'CONNECTING...', true)
   const { error } = await supabase.auth.signInWithPassword({ email, password: pass })
-  if (error) { msg('login-error', error.message); btn('login-btn','ENTER SYNAPSE',false) }
+  if (error) { msg('login-error', error.message); btn('login-btn', 'ENTER SYNAPSE', false) }
   else window.location.href = 'app.html'
 })
-
 document.getElementById('signup-btn').addEventListener('click', async () => {
   const email = document.getElementById('signup-email').value.trim()
   const pass  = document.getElementById('signup-password').value
   document.getElementById('signup-error').style.display = 'none'
-  if (!email||!pass) return msg('signup-error','Please fill all fields')
-  if (pass.length < 6) return msg('signup-error','Password must be at least 6 characters')
-  btn('signup-btn','CREATING...',true)
+  if (!email || !pass) return msg('signup-error', 'Please fill all fields')
+  if (pass.length < 6) return msg('signup-error', 'Password must be at least 6 characters')
+  btn('signup-btn', 'CREATING...', true)
   const { data, error } = await supabase.auth.signUp({ email, password: pass })
-  if (error) { msg('signup-error', error.message); btn('signup-btn','CREATE ACCOUNT',false) }
+  if (error) { msg('signup-error', error.message); btn('signup-btn', 'CREATE ACCOUNT', false) }
   else if (data.session) window.location.href = 'app.html'
-  else { msg('signup-error','Account created! Check email to confirm, then login.',true); btn('signup-btn','CREATE ACCOUNT',false); setTimeout(()=>form('login-form'),3000) }
+  else { msg('signup-error', 'Account created! Login now.', true); btn('signup-btn', 'CREATE ACCOUNT', false); setTimeout(() => form('login-form'), 2000) }
 })
-
 document.getElementById('forgot-btn').addEventListener('click', async () => {
   const email = document.getElementById('forgot-email').value.trim()
-  if (!email) return msg('forgot-msg','Enter your email')
-  btn('forgot-btn','SENDING...',true)
-  await supabase.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin + '/login.html' })
-  msg('forgot-msg','Reset link sent — check your inbox',true)
-  btn('forgot-btn','SEND RESET LINK',false)
+  if (!email) return msg('forgot-msg', 'Enter your email')
+  btn('forgot-btn', 'SENDING...', true)
+  await supabase.auth.resetPasswordForEmail(email)
+  msg('forgot-msg', 'Reset link sent!', true)
+  btn('forgot-btn', 'SEND RESET LINK', false)
 })
-
-document.getElementById('to-signup').addEventListener('click',  ()=>form('signup-form'))
-document.getElementById('to-forgot').addEventListener('click',  ()=>form('forgot-form'))
-document.getElementById('to-login').addEventListener('click',   ()=>form('login-form'))
-document.getElementById('to-login2').addEventListener('click',  ()=>form('login-form'))
-document.addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('login-btn').click() })
-if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js')
+document.getElementById('to-signup').addEventListener('click',  () => form('signup-form'))
+document.getElementById('to-forgot').addEventListener('click',  () => form('forgot-form'))
+document.getElementById('to-login').addEventListener('click',   () => form('login-form'))
+document.getElementById('to-login2').addEventListener('click',  () => form('login-form'))
+document.addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('login-btn').click() })
 </script>
-
 <script>
-const canvas=document.getElementById('starfield'),ctx=canvas.getContext('2d')
-let stars=[]
-function init(){
-  canvas.width=window.innerWidth;canvas.height=window.innerHeight
-  stars=Array.from({length:120},()=>({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random(),speed:Math.random()*0.15+0.03,opacity:Math.random()*0.5+0.1}))
+const canvas = document.getElementById('starfield'), ctx = canvas.getContext('2d')
+let stars = []
+function init() {
+  canvas.width = window.innerWidth; canvas.height = window.innerHeight
+  stars = Array.from({length:120}, () => ({x:Math.random()*canvas.width, y:Math.random()*canvas.height, r:Math.random(), speed:Math.random()*0.15+0.03, opacity:Math.random()*0.5+0.1}))
 }
-function draw(){
+function draw() {
   ctx.clearRect(0,0,canvas.width,canvas.height)
-  stars.forEach(s=>{ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle=`rgba(200,200,200,${s.opacity})`;ctx.fill();s.y+=s.speed;if(s.y>canvas.height){s.y=0;s.x=Math.random()*canvas.width}})
+  stars.forEach(s => { ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2); ctx.fillStyle=`rgba(200,200,200,${s.opacity})`; ctx.fill(); s.y+=s.speed; if(s.y>canvas.height){s.y=0;s.x=Math.random()*canvas.width} })
   requestAnimationFrame(draw)
 }
-init();draw();window.addEventListener('resize',init)
+init(); draw(); window.addEventListener('resize', init)
 </script>
 </body>
 </html>

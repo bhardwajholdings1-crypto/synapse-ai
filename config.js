@@ -1,21 +1,14 @@
-// ============================================================
-// SYNAPSE AI — Configuration
-// BhardwajTechnologieS | Built by Arnav Bhardwaj
-//
-// ⚠️  DO NOT put real keys here — this file goes to GitHub
-// Real keys are added directly on GitHub.com after pushing
-// ============================================================
+// SYNAPSE AI — BhardwajTechnologieS
+// Built by Arnav Bhardwaj — CEO/Chairman
+// Keys are stored in Netlify environment variables — NOT here
 
 window.SYNAPSE_CONFIG = {
-
   supabase: {
     url:  'https://pxxeaqtghjqzsiqlhtme.supabase.co',
     anon: 'sb_publishable_bbL0XiXl_CEEPQ1dNfjViQ_zUGDU3c1',
   },
-
-  // ✏️ Real keys added on GitHub.com after push
-  openrouter: ['OPENROUTER_KEY'],
-  gemini:      'GEMINI_KEY',
-
-  referer: 'https://bhardwajholdings1-crypto.github.io',
+  // Real keys injected by Netlify at runtime via _keys.js
+  openrouter: null,
+  gemini: null,
+  referer: 'https://incredible-choux-17dac9.netlify.app',
 }

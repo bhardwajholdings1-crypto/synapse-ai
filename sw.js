@@ -1,37 +1,8 @@
-// SYNAPSE AI — Service Worker
-// BhardwajTechnologieS | Built by Arnav Bhardwaj
-
-const CACHE = 'synapse-ai-v1'
-const ASSETS = [
-  '/',
-  '/index.html',
-  '/app.html',
-  '/login.html',
-  '/style.css',
-  '/manifest.json',
-]
-
-// Install — cache all assets
-self.addEventListener('install', e => {
-  e.waitUntil(
-    caches.open(CACHE).then(cache => cache.addAll(ASSETS))
-  )
-  self.skipWaiting()
-})
-
-// Activate — clean old caches
-self.addEventListener('activate', e => {
-  e.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
-    )
-  )
-  self.clients.claim()
-})
-
-// Fetch — serve from cache, fallback to network
+const CACHE = 'synapse-v1'
+self.addEventListener('install', e => { self.skipWaiting() })
+self.addEventListener('activate', e => { self.clients.claim() })
 self.addEventListener('fetch', e => {
-  e.respondWith(
-    caches.match(e.request).then(cached => cached || fetch(e.request))
-  )
+  if (e.request.method !== 'GET') return
+  if (e.request.url.includes('supabase') || e.request.url.includes('openrouter') || e.request.url.includes('googleapis') || e.request.url.includes('netlify/functions')) return
+  e.respondWith(fetch(e.request).catch(() => caches.match(e.request)))
 })
