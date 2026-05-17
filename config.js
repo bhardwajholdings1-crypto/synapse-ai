@@ -13,9 +13,9 @@ window.SYNAPSE_CONFIG = {
     anon: 'sb_publishable_bbL0XiXl_CEEPQ1dNfjViQ_zUGDU3c1',
   },
 
-  openrouter: ['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'],
+  openrouter: ['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'],
 
   gemini: 'AIzaSyDjrPQT34ZvccIyIXAyg2kDiD7LhypxcbY',
 
-  referer: 'https://bhardwajholdings1-crypto.github.io',
+  referer: 'https://incredible-choux-17dac9.netlify.app',
 }
